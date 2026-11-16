@@ -1,0 +1,281 @@
+#include "GameManager.h"
+
+#include "Entity.h"
+#include "Debug.h"
+#include "InputManager.h"
+
+#include <string>
+#include <cassert>
+
+#include "SDL3/SDL.h"
+#include <SDL_ttf.h>
+
+
+GameManager::GameManager()
+{
+    mpWindow = nullptr;
+    mpRenderer = nullptr;
+    mpTextEngine = nullptr;
+    mpFont = nullptr;
+    mDeltaTime = 0.0f;
+    mpScene = nullptr;
+    mWindowWidth = -1;
+    mWindowHeight = -1;
+    mClearColor = Color::Black;
+}
+
+GameManager* GameManager::Get()
+{
+    static GameManager mInstance;
+
+    return &mInstance;
+}
+
+void GameManager::CreateLine(Line& p_line)
+{
+    m_lines.push_back(&p_line);
+}
+
+void GameManager::ResolveCollisionWithLine(Entity* p_entity)
+{
+    for (Line* line : m_lines)
+    {
+        Vector2f toLine = line->point - p_entity->GetPosition();
+        float distance = Vector2f::Dot(toLine, line->normal);
+        float overlap = p_entity->GetRadius() - distance;
+        if (overlap > 0.0f)
+        {
+            p_entity->SetPosition(p_entity->GetPosition() - line->normal * overlap);
+
+            float dotVel = Vector2f::Dot(p_entity->m_velocity, line->normal);
+            Vector2f vn = line->normal * dotVel;
+            Vector2f vt = p_entity->m_velocity - vn;
+            p_entity->m_velocity = -1 * vn + vt;
+        }
+    }
+}
+
+bool GameManager::ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB)
+{
+    Entity* mouvEnt = nullptr;
+    Entity* fixedEnt = nullptr;
+    if (p_entB->m_velocity != Vector2f{ 0, 0 })
+    {
+        mouvEnt = p_entB;
+        fixedEnt = p_entA;
+    }
+    else if (p_entA->m_velocity != Vector2f{ 0, 0 })
+    {
+        mouvEnt = p_entA;
+        fixedEnt = p_entB;
+    }
+
+    if (mouvEnt == nullptr || fixedEnt == nullptr)
+    {
+        return false;
+    }
+    
+    //Correction Position de A en mouvement et B fixe
+    Vector2f AB = fixedEnt->GetPosition() - mouvEnt->GetPosition();
+    float distance = AB.Magnitude();
+    AB.Normalize();
+    Vector2f normal = AB;
+    float overlap = mouvEnt->GetRadius() + fixedEnt->GetRadius() - distance;
+    if (overlap > 0.0f) // collision
+    {
+        Vector2f newPos = { mouvEnt->GetPosition().x - normal.x * overlap, mouvEnt->GetPosition().y - normal.y * overlap };
+        mouvEnt->SetPosition(newPos);
+
+        //Correction Velocité de A en mouvement et B fixe
+        Vector2f vn = normal * Vector2f::Dot(mouvEnt->m_velocity, normal);
+        Vector2f vt = mouvEnt->m_velocity - vn;
+        mouvEnt->m_velocity = -1 * vn + vt;
+        return true;
+    }
+    return false;
+}
+
+GameManager::~GameManager()
+{
+    while (mEntities.empty() == false)
+    {
+        Entity* entity = mEntities.front();
+        mEntities.pop_front();
+
+        delete entity;
+    }
+
+    while (mEntitiesToAdd.empty() == false)
+    {
+        Entity* entity = mEntitiesToAdd.front();
+        mEntitiesToAdd.pop_front();
+
+        delete entity;
+    }
+
+    delete mpScene;
+
+    TTF_CloseFont(mpFont);
+    TTF_DestroyRendererTextEngine(mpTextEngine);
+    TTF_Quit();
+
+    SDL_DestroyRenderer(mpRenderer);
+    SDL_DestroyWindow(mpWindow);
+    SDL_Quit();
+}
+
+bool GameManager::Initialize(int width, int height, const char* title, Color clearColor)
+{
+    assert(mpWindow == nullptr);
+    if (mpWindow != nullptr)
+        return false;
+
+    if (SDL_Init(SDL_INIT_VIDEO) == false)
+    {
+        SDL_Log("SDL initialization failed: %s", SDL_GetError());
+        return false;
+    }
+
+    if (SDL_CreateWindowAndRenderer(title, width, height, 0, &mpWindow, &mpRenderer) == false)
+    {
+        SDL_Log("Window and renderer creation failed: %s", SDL_GetError());
+        return false;
+    }
+
+    if (TTF_Init() == false)
+    {
+        SDL_Log("SDL_ttf initialization failed: %s", SDL_GetError());
+        return false;
+    }
+
+    mpTextEngine = TTF_CreateRendererTextEngine(mpRenderer);
+    if (mpTextEngine == nullptr)
+    {
+        SDL_Log("Text renderer creation failed: %s", SDL_GetError());
+        return false;
+    }
+
+    const char* basePath = SDL_GetBasePath();
+    if (basePath == nullptr)
+    {
+        SDL_Log("Application path unavailable: %s", SDL_GetError());
+        return false;
+    }
+
+    const std::string fontPath = std::string(basePath) + "res/LightEngine/Fonts/Abel-Regular.ttf";
+    mpFont = TTF_OpenFont(fontPath.c_str(), 20.f);
+    if (mpFont == nullptr)
+    {
+        SDL_Log("Font loading failed: %s", SDL_GetError());
+        return false;
+    }
+
+    if (SDL_SetRenderVSync(mpRenderer, 1) == false)
+    {
+        SDL_Log("VSync activation failed: %s", SDL_GetError());
+        return false;
+    }
+
+    if (SDL_SetRenderDrawBlendMode(mpRenderer, SDL_BLENDMODE_BLEND) == false)
+    {
+        SDL_Log("Draw blend mode setup failed: %s", SDL_GetError());
+        return false;
+    }
+
+    mWindowWidth = width;
+    mWindowHeight = height;
+    mClearColor = clearColor;
+
+    return true;
+}
+
+void GameManager::Run()
+{
+    InputManager* input = InputManager::Get();
+
+    uint64 previousTime = SDL_GetTicksNS();
+    while (input->IsQuit() == false)
+    {
+        const uint64 frameStart = SDL_GetTicksNS();
+        SetDeltaTime(frameStart - previousTime);
+        previousTime = frameStart;
+
+        input->Update();
+
+        Update();
+
+        Draw();
+    }
+}
+
+void GameManager::Update()
+{
+    mpScene->OnUpdate();
+
+    mEntities.splice(mEntities.end(), mEntitiesToAdd);
+
+    //Update
+    for (Entity* entity : mEntities)
+    {
+        if (entity->ToDestroy() == false)
+            entity->Update();
+    }
+
+    //Collision
+    for (auto it1 = mEntities.begin(); it1 != mEntities.end(); ++it1)
+    {
+        Entity* entity = *it1;
+
+        ResolveCollisionWithLine(entity);
+
+        auto it2 = it1;
+        ++it2;
+        for (; it2 != mEntities.end(); ++it2)
+        {
+            Entity* otherEntity = *it2;
+
+            if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+            {
+                continue;
+            }
+            //#TODO
+
+            entity->OnCollision(otherEntity);
+            otherEntity->OnCollision(entity);
+        }
+    }
+
+    for (auto it = mEntities.begin(); it != mEntities.end(); )
+    {
+        Entity* entity = *it;
+
+        if (entity->ToDestroy() == false)
+        {
+            ++it;
+            continue;
+        }
+
+        delete entity;
+        it = mEntities.erase(it);
+    }
+}
+
+void GameManager::Draw()
+{
+    SDL_SetRenderDrawColor(mpRenderer,
+        mClearColor.r, mClearColor.g, mClearColor.b, mClearColor.a);
+    SDL_RenderClear(mpRenderer);
+
+    Debug::Draw(mpRenderer, mpTextEngine, mpFont, 0);
+
+    for (Entity* entity : mEntities)
+    {
+        entity->Draw(mpRenderer);
+    }
+
+    Debug::Draw(mpRenderer, mpTextEngine, mpFont, 1);
+
+    Debug::Clear();
+
+    SDL_RenderPresent(mpRenderer);
+}
