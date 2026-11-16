@@ -92,6 +92,7 @@ bool GameManager::ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB)
         mouvEnt->m_velocity = -1 * vn + vt;
         return true;
     }
+
     return false;
 }
 
