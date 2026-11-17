@@ -182,16 +182,29 @@ void SampleScene::OnUpdate()
     {
         if (m_selectedPHEnt)
         {
-            m_timerToHeld += dt;
+            if (m_upOrDown == false)
+            {
+                m_timerToHeld += dt;
+                if (m_timerToHeld > m_maxTimeToHeld)
+                {
+                    m_upOrDown = true;
+                }
+            }
+            else
+            {
+                m_timerToHeld -= dt;
+                if (m_timerToHeld < 0.0f)
+                {
+                    m_upOrDown = false;
+                }
+            }
 
             Vector2f center = m_selectedPHEnt->GetPosition();
 
             Vector2f dir = mousePos - center;
             dir.Normalize();
 
-            float distance = m_timerToHeld * (m_facteurPower * 0.2f);
-            if (distance > m_maxDistance)
-                distance = m_maxDistance;
+            float distance = m_timerToHeld * (m_facteurPower * 0.3f);
 
             m_viseur.a = center;
             m_viseur.b = center - dir * distance;
@@ -206,12 +219,10 @@ void SampleScene::OnUpdate()
             Vector2f dir = mousePos - center;
             dir.Normalize();
 
-            //float distance = m_timerToHeld * m_facteurPower;
-            //if (distance > m_maxDistance * 0.2f)
-            //    distance = m_maxDistance;
-            //m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
+            float distance = m_timerToHeld * m_facteurPower;
+            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
 
-            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * m_timerToHeld * m_facteurPower);
+            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
             m_timerToHeld = 0.0;
 
             m_viseur.a = {0, 0};

@@ -19,10 +19,12 @@ class SampleScene : public Scene
 
     Segment m_viseur;
     float m_maxDistance = 400;
+    bool m_upOrDown = false;
 
     float m_timerToHeld = 0.0f;
+    float m_maxTimeToHeld = 1.8f;
 
-    float m_facteurPower = 1111;
+    float m_facteurPower = 666;
 
 public:
     void OnInitialize() override;
