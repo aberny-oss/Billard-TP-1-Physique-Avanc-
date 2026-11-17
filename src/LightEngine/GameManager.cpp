@@ -175,11 +175,31 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
 
 bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
 {
+    //Correction Position de A en mouvement et B fixe
+    Vector2f AB = p_entB->GetPosition() - p_entA->GetPosition();
+    float distance = AB.Magnitude();
+    AB.Normalize();
+    Vector2f normal = AB;
+    float overlap = p_entA->GetRadius() + p_entB->GetRadius() - distance;
+    if (overlap > 0.0f) // collision
+    {
+        float demiOverlap = overlap * 0.5f;
+        Vector2f newPosA = { p_entA->GetPosition().x - normal.x * demiOverlap, p_entA->GetPosition().y - normal.y * demiOverlap };
+        p_entA->SetPosition(newPosA);
 
+        Vector2f newPosB = { p_entB->GetPosition().x + normal.x * demiOverlap, p_entB->GetPosition().y + normal.y * demiOverlap };
+        p_entB->SetPosition(newPosB);
 
+        Vector2f vnA = normal * Vector2f::Dot(p_entA->m_velocity, normal);
+        Vector2f vtA = p_entA->m_velocity - vnA;
+        Vector2f vnB = normal * Vector2f::Dot(p_entB->m_velocity, normal);
+        Vector2f vtB = p_entB->m_velocity - vnB;
 
+        p_entA->m_velocity = vnB + vtA;
+        p_entB->m_velocity = vnA + vtB;
 
-
+        return true;
+    }
     return false;
 }
 

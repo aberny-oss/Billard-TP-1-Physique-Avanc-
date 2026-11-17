@@ -36,10 +36,11 @@ void SampleScene::OnInitialize()
     m_circleFixed = CreateEntity<Entity>(25.0f, Color::Magenta);
     m_circleFixed->SetPosition({ wWidth * 0.5f, wHeight * 0.5f });
 
-    for (int i = 0; i < 3; ++i)
+    float radius = 10;
+    for (int i = 0; i < 8; ++i)
     {
-        PhysicEntity* phent = CreateEntity<PhysicEntity>(10.f, Color::Red);
-        phent->SetPosition({ 100 + i * 50, 50 });
+        PhysicEntity* phent = CreateEntity<PhysicEntity>(radius, Color::Red);
+        phent->SetPosition({ 100 + i * (radius * 3), 50.f });
         m_phEnt.push_back(phent);
     }
 
