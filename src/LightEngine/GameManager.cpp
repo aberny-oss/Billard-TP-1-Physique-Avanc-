@@ -343,16 +343,16 @@ void GameManager::Update()
         {
             Entity* otherEntity = *it2;
 
-            if (entity->m_velocity != Vector2f{ 0, 0 } && otherEntity->m_velocity != Vector2f{ 0, 0 })
+            if (entity->IsFixed() || otherEntity->IsFixed())
             {
-                if (ResolveColisionCBC(entity, otherEntity) == false)
+                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
                 {
                     continue;
                 }
             }
             else
             {
-                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+                if (ResolveColisionCBC(entity, otherEntity) == false)
                 {
                     continue;
                 }

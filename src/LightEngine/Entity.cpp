@@ -15,6 +15,8 @@ void Entity::Initialize(float radius, const Color& color)
     mCircle.color = color;
     mCircle.filled = true;
 
+    m_velocity = { 0, 0 };
+
     OnInitialize();
 }
 
@@ -55,64 +57,6 @@ void Entity::Update()
 
     mCircle.position += m_velocity * dt;
 
-    //Vector2f bottomRight = GetPosition(1.0f, 1.0f);
-    //Vector2f upLeft = GetPosition(0.0f, 0.0f);
-
-    //Scene* sc = GetScene();
-    //int WWidth = sc->GetWindowWidth();
-    //int WHeight = sc->GetWindowHeight();
-
-    ////Line Up
-    //Line up;
-    //up.normal = { 0, -1 };
-
-    ////Line Down
-    //Line down;
-    //down.normal = { 0, 1 };
-
-    ////Line Left
-    //Line left;
-    //left.normal = { -1, 0 };
-
-    ////Line Right
-    //Line right;
-    //right.normal = { 1, 0 };
-
-    ////Bord Right
-    //float overlapRight = bottomRight.x - WWidth;
-    //if (overlapRight > 0)
-    //{
-    //    mCircle.position.x -= overlapRight;
-    //    m_velocity.x *= -1;
-    //    m_velocity.x *= 0.5f;
-    //}
-
-    ////Bord Down
-    //float overlapDown = bottomRight.y - WHeight;
-    //if (overlapDown > 0)
-    //{
-    //    mCircle.position.y -= overlapDown;
-    //    m_velocity.y *= -1;
-    //    m_velocity.y *= 0.5f;
-    //}
-
-    ////Bord Left
-    //float overlapLeft = upLeft.x;
-    //if (overlapLeft < 0)
-    //{
-    //    mCircle.position.x -= overlapLeft;
-    //    m_velocity.x *= -1;
-    //    m_velocity.x *= 0.5f;
-    //}
-
-    ////Bord Up
-    //float overlapUp = upLeft.y;
-    //if (overlapUp < 0)
-    //{
-    //    mCircle.position.y -= overlapUp;
-    //    m_velocity.y *= -1;
-    //    m_velocity.y *= 0.5f;
-    //}
 
     OnUpdate();
 }

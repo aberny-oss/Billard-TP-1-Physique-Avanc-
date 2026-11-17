@@ -15,6 +15,7 @@ protected:
     int mTag = -1;
     bool mToDestroy = false;
     Vector2f m_velocity;
+    bool m_fixed = false;
 
 public:
     void SetPosition(Vector2f position, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -43,6 +44,9 @@ public:
     bool IsPointInside(Vector2f p_point);
 
     void SetColor(Color p_color) { mCircle.color = p_color; }
+
+    void SetIsFixed(bool p_fixed) { m_fixed = p_fixed; }
+    bool IsFixed() { return m_fixed; }
 
 protected:
     Entity() = default;

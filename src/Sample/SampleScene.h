@@ -8,7 +8,6 @@ class PhysicEntity;
 
 class SampleScene : public Scene
 {
-    Rectangle m_rectangle;
 
     Line m_lineUp;
     Line m_lineDown;
@@ -19,7 +18,9 @@ class SampleScene : public Scene
 
     PhysicEntity* m_selectedPHEnt;
 
-    Entity* m_circleFixed;
+    Segment m_viseur;
+
+    float m_timerToHeld = 0.0f;
 
 public:
     void OnInitialize() override;
