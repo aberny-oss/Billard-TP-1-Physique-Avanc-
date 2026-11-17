@@ -8,19 +8,21 @@ class PhysicEntity;
 
 class SampleScene : public Scene
 {
-
-    Line m_lineUp;
-    Line m_lineDown;
-    Line m_lineLeft;
-    Line m_lineRight;
+    Rectangle m_rectUp;
+    Rectangle m_rectBottom;
+    Rectangle m_rectLeft;
+    Rectangle m_rectRight;
 
     std::vector<PhysicEntity*> m_phEnt;
 
     PhysicEntity* m_selectedPHEnt;
 
     Segment m_viseur;
+    float m_maxDistance = 400;
 
     float m_timerToHeld = 0.0f;
+
+    float m_facteurPower = 1111;
 
 public:
     void OnInitialize() override;

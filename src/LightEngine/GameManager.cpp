@@ -334,8 +334,11 @@ void GameManager::Update()
     {
         Entity* entity = *it1;
 
-        ResolveCollisionWithLine(entity);
-        ResolveCollisionARC(entity);
+        if (entity->IsFixed() == false)
+        {
+            ResolveCollisionWithLine(entity);
+            ResolveCollisionARC(entity);
+        }
 
         auto it2 = it1;
         ++it2;

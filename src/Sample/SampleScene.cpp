@@ -5,7 +5,7 @@
 #include "Debug.h"
 #include "PhysicEntity.h"
 #include <cmath>
-
+#include <algorithm>
 
 void SampleScene::OnInitialize()
 {
@@ -14,26 +14,6 @@ void SampleScene::OnInitialize()
     int wWidth = GetWindowWidth();
     int wHeight = GetWindowHeight();
 
-    m_lineUp;
-    m_lineUp.normal = { 0, -1 };
-    m_lineUp.point = { 0, 0 };
-    gm->CreateLine(m_lineUp);
-
-    m_lineDown;
-    m_lineDown.normal = { 0, 1 };
-    m_lineDown.point = { wWidth, wHeight };
-    gm->CreateLine(m_lineDown);
-
-    m_lineLeft;
-    m_lineLeft.normal = { -1, 0 };
-    m_lineLeft.point = { 0, 0 };
-    gm->CreateLine(m_lineLeft);
-
-    m_lineRight;
-    m_lineRight.normal = { 1, 0 };
-    m_lineRight.point = { wWidth, wHeight };
-    gm->CreateLine(m_lineRight);
-
     Vector2f topLeft = { 0, 0 };
     Vector2f topRight = { wWidth, 0 };
     Vector2f bottomLeft = { 0, wHeight };
@@ -41,42 +21,71 @@ void SampleScene::OnInitialize()
 
     //create hole
     float holeRadius = 15;
+    float margin = 6;
 
     //up left
     PhysicEntity* upLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    upLeft->SetPosition(topLeft,0, 0);
+    upLeft->SetPosition(topLeft + margin,0, 0);
     upLeft->SetIsFixed(true);
     m_phEnt.push_back(upLeft);
 
     // up right
     PhysicEntity* upRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    upRight->SetPosition(topRight, 0, 1);
+    upRight->SetPosition({ topRight.x - margin, topRight.y + margin }, 1, 0);
     upRight->SetIsFixed(true);
     m_phEnt.push_back(upRight);
 
     //down left
     PhysicEntity* downleft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    downleft->SetPosition(bottomLeft, 0, 1);
+    downleft->SetPosition({ bottomLeft.x + margin, bottomLeft.y - margin }, 0, 1);
     downleft->SetIsFixed(true);
     m_phEnt.push_back(downleft);
 
     //down right
     PhysicEntity* downRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    downRight->SetPosition(bottomRight, 1, 1);
+    downRight->SetPosition(bottomRight - margin, 1, 1);
     downRight->SetIsFixed(true);
     m_phEnt.push_back(downRight);
 
     //midle left
     PhysicEntity* midleLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    midleLeft->SetPosition(bottomLeft * 0.5f);
+    midleLeft->SetPosition({ bottomLeft.x * 0.5f + margin, bottomLeft.y * 0.5f }, 0, 0.5f);
     midleLeft->SetIsFixed(true);
     m_phEnt.push_back(midleLeft);
 
     //midle right
     PhysicEntity* midleRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    midleRight->SetPosition({ bottomRight.x, bottomRight.y * 0.5f });
+    midleRight->SetPosition({ bottomRight.x - margin, bottomRight.y * 0.5f }, 1, 0.5f);
     midleRight->SetIsFixed(true);
     m_phEnt.push_back(midleRight);
+
+    //rect up
+    m_rectUp.position = topLeft;
+    m_rectUp.size = { (float)wWidth, holeRadius };
+    m_rectUp.color = Color::Green;
+    m_rectUp.filled = true;
+    gm->CreateRectangle(m_rectUp);
+
+    //rect down
+    m_rectBottom.position = { bottomLeft.x, bottomLeft.y - holeRadius };
+    m_rectBottom.size = { (float)wWidth, holeRadius };
+    m_rectBottom.color = Color::Green;
+    m_rectBottom.filled = true;
+    gm->CreateRectangle(m_rectBottom);
+
+    //rect left
+    m_rectLeft.position = topLeft;
+    m_rectLeft.size = { holeRadius, (float)wHeight };
+    m_rectLeft.color = Color::Green;
+    m_rectLeft.filled = true;
+    gm->CreateRectangle(m_rectLeft);
+
+    //rect right
+    m_rectRight.position = { topRight.x - holeRadius, topRight.y };
+    m_rectRight.size = { holeRadius, (float)wHeight };
+    m_rectRight.color = Color::Green;
+    m_rectRight.filled = true;
+    gm->CreateRectangle(m_rectRight);
 
 
     float radius = 10.0f;
@@ -180,8 +189,12 @@ void SampleScene::OnUpdate()
             Vector2f dir = mousePos - center;
             dir.Normalize();
 
+            float distance = m_timerToHeld * (m_facteurPower * 0.2f);
+            if (distance > m_maxDistance)
+                distance = m_maxDistance;
+
             m_viseur.a = center;
-            m_viseur.b = center - dir * m_timerToHeld * 100;
+            m_viseur.b = center - dir * distance;
         }
     }
     if (im->IsMouseUp(SDL_BUTTON_LEFT))
@@ -193,7 +206,12 @@ void SampleScene::OnUpdate()
             Vector2f dir = mousePos - center;
             dir.Normalize();
 
-            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * m_timerToHeld * 999);
+            //float distance = m_timerToHeld * m_facteurPower;
+            //if (distance > m_maxDistance * 0.2f)
+            //    distance = m_maxDistance;
+            //m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
+
+            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * m_timerToHeld * m_facteurPower);
             m_timerToHeld = 0.0;
 
             m_viseur.a = {0, 0};
@@ -210,13 +228,13 @@ void SampleScene::OnUpdate()
 
     int margin = 3;
     //up
-    Debug::DrawLine(topLeft + margin, topRight + margin, Color::Green);
+    Debug::DrawRectangle(m_rectUp.position, m_rectUp.size, m_rectUp.color, m_rectUp.filled);
     //down
-    Debug::DrawLine(bottomLeft - margin, bottomRight - margin, Color::Green);
+    Debug::DrawRectangle(m_rectBottom.position, m_rectBottom.size, m_rectBottom.color, m_rectBottom.filled);
     //left
-    Debug::DrawLine(topLeft + margin, bottomLeft + margin, Color::Green);
+    Debug::DrawRectangle(m_rectLeft.position, m_rectLeft.size, m_rectLeft.color, m_rectLeft.filled);
     //right
-    Debug::DrawLine(topRight - margin, bottomRight - margin, Color::Green);
+    Debug::DrawRectangle(m_rectRight.position, m_rectRight.size, m_rectRight.color, m_rectRight.filled);
 
     //viseur
     Vector2f Viseur = m_viseur.b - m_viseur.a;
