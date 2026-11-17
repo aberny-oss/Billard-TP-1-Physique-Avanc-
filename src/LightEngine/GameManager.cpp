@@ -10,6 +10,8 @@
 #include "SDL3/SDL.h"
 #include <SDL_ttf.h>
 
+#include <algorithm>
+
 
 GameManager::GameManager()
 {
@@ -34,6 +36,11 @@ GameManager* GameManager::Get()
 void GameManager::CreateLine(Line& p_line)
 {
     m_lines.push_back(&p_line);
+}
+
+void GameManager::CreateRectangle(Rectangle& p_rectangle)
+{
+    m_rectangles.push_back(&p_rectangle);
 }
 
 void GameManager::ResolveCollisionWithLine(Entity* p_entity)
@@ -92,6 +99,87 @@ bool GameManager::ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB)
         mouvEnt->m_velocity = -1 * vn + vt;
         return true;
     }
+    return false;
+}
+
+void GameManager::ResolveCollisionARC(Entity* p_entA)
+{
+    Vector2f centerA = p_entA->GetPosition();
+    float radiusA = p_entA->GetRadius();
+
+    Vector2f topLeft = p_entA->GetPosition(0, 0);
+    Vector2f bottomRight = p_entA->GetPosition(1, 1);
+
+    for (Rectangle* rect : m_rectangles)
+    {
+        Vector2f bottomRightRect = rect->position + rect->size;
+        // si rentre dans le if alors il est a l'interieur du rect
+        if (topLeft.x >= rect->position.x && topLeft.y >= rect->position.y && bottomRight.x <= bottomRightRect.x && bottomRight.y <= bottomRightRect.y)
+        {
+            float leftSide = centerA.x - rect->position.x;
+            float rightSide = bottomRightRect.x - centerA.x;
+            float topSide = centerA.y - rect->position.y;
+            float bottomSide = bottomRightRect.y - centerA.y;
+
+            float SideSelected = std::min({ leftSide, rightSide, topSide, bottomSide });
+
+            Vector2f normal = { 0, 0 };
+            if (SideSelected == leftSide)
+            {
+                normal = { 1, 0 };
+            }
+            else if (SideSelected == rightSide)
+            {
+                normal = { -1, 0 };
+            }
+            else if (SideSelected == topSide)
+            {
+                normal = { 0, 1 };
+            }
+            else if (SideSelected == bottomSide)
+            {
+                normal = { 0, -1 };
+            }
+
+            float overlap = radiusA + SideSelected;
+            p_entA->SetPosition(p_entA->GetPosition() - normal * overlap);
+
+            float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
+            Vector2f vn = normal * dotVel;
+            Vector2f vt = p_entA->m_velocity - vn;
+            p_entA->m_velocity = -1 * vn + vt;
+        }
+        else
+        {
+            float closestX = std::clamp(centerA.x, rect->position.x, bottomRightRect.x);
+            float closestY = std::clamp(centerA.y, rect->position.y, bottomRightRect.y);
+            Vector2f closestPoint = { closestX, closestY };
+
+            Vector2f direction = closestPoint - centerA;
+            float distance = direction.Magnitude();
+
+            if (distance < radiusA) // collision
+            {
+                Vector2f normal = direction.Normalized();
+                float overlap = radiusA - distance;
+                p_entA->SetPosition(p_entA->GetPosition() - normal * overlap);
+
+                float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
+                Vector2f vn = normal * dotVel;
+                Vector2f vt = p_entA->m_velocity - vn;
+                p_entA->m_velocity = -1 * vn + vt;
+            }
+        }
+    }
+}
+
+bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
+{
+
+
+
+
+
     return false;
 }
 
@@ -227,6 +315,7 @@ void GameManager::Update()
         Entity* entity = *it1;
 
         ResolveCollisionWithLine(entity);
+        ResolveCollisionARC(entity);
 
         auto it2 = it1;
         ++it2;
@@ -234,9 +323,19 @@ void GameManager::Update()
         {
             Entity* otherEntity = *it2;
 
-            if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+            if (entity->m_velocity != Vector2f{ 0, 0 } && otherEntity->m_velocity != Vector2f{ 0, 0 })
             {
-                continue;
+                if (ResolveColisionCBC(entity, otherEntity) == false)
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+                {
+                    continue;
+                }
             }
             //#TODO
 

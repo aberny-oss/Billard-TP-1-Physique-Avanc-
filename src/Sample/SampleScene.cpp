@@ -43,6 +43,14 @@ void SampleScene::OnInitialize()
         m_phEnt.push_back(phent);
     }
 
+    m_rectangle.position = { 200, 150 };
+    m_rectangle.size = { 150, 150 };
+    m_rectangle.color = Color::Green;
+    m_rectangle.filled = false;
+    gm->CreateRectangle(m_rectangle);
+
+
+
 }
 
 void SampleScene::OnUpdate()
@@ -88,8 +96,7 @@ void SampleScene::OnUpdate()
         }
     }
 
-
-
+    Debug::DrawRectangle(m_rectangle.position, m_rectangle.size, m_rectangle.color, m_rectangle.filled);
 
     
 }

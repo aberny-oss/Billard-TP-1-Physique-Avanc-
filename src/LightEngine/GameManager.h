@@ -21,6 +21,7 @@ class GameManager
     std::list<Entity*> mEntitiesToAdd;
 
     std::list<Line*> m_lines;
+    std::list<Rectangle*> m_rectangles;
 
     SDL_Window* mpWindow;
     SDL_Renderer* mpRenderer;
@@ -52,6 +53,8 @@ private:
 
     void ResolveCollisionWithLine(Entity* p_entity);
     bool ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB);
+    void ResolveCollisionARC(Entity* p_entA);
+    bool ResolveColisionCBC(Entity* p_entA, Entity* p_entB);
 
 public:
     ~GameManager();
@@ -68,7 +71,7 @@ public:
     Scene* GetScene() const { return mpScene; }
 
     void CreateLine(Line& p_line);
-
+    void CreateRectangle(Rectangle& p_rectangle);
 
     friend class Scene;
 };

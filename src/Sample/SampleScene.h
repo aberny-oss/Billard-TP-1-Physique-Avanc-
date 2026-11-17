@@ -8,13 +8,11 @@ class PhysicEntity;
 
 class SampleScene : public Scene
 {
+    Rectangle m_rectangle;
 
     Line m_lineUp;
-
     Line m_lineDown;
-
     Line m_lineLeft;
-
     Line m_lineRight;
 
     std::vector<PhysicEntity*> m_phEnt;
