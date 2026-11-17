@@ -16,8 +16,19 @@ void Entity::Initialize(float radius, const Color& color)
     mCircle.filled = true;
 
     m_velocity = { 0, 0 };
+    m_acceleration = { 0, 0 };
 
     OnInitialize();
+}
+
+void Entity::FixeUpdate(float dt)
+{
+    m_velocity += m_acceleration * dt;
+    if (m_velocity.Magnitude() < 3.0f)
+    {
+        m_velocity = { 0, 0 };
+    }
+    mCircle.position += m_velocity * dt;
 }
 
 void Entity::Destroy()
@@ -53,11 +64,6 @@ Vector2f Entity::GetPosition(float ratioX, float ratioY) const
 
 void Entity::Update()
 {
-    float dt = GetDeltaTime();
-
-    mCircle.position += m_velocity * dt;
-
-
     OnUpdate();
 }
 

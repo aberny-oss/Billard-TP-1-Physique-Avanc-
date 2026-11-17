@@ -6,6 +6,7 @@
 #include "PhysicEntity.h"
 #include <cmath>
 #include <algorithm>
+#include <stdlib.h>
 
 void SampleScene::OnInitialize()
 {
@@ -92,10 +93,10 @@ void SampleScene::OnInitialize()
     float diameter = radius * 2.0f;
     float rowHeight = radius * std::sqrt(3.0f); 
 
-    Vector2f placeFirst = { wWidth * 0.5f, wHeight * 0.2f };
+    Vector2f placeFirst = { wWidth * 0.5f, wHeight * 0.4f };
 
     bool color = false;
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 15; ++i)
     {
         float startX = placeFirst.x - (i * radius);
         float posY = placeFirst.y - (i * rowHeight);
@@ -104,18 +105,21 @@ void SampleScene::OnInitialize()
         {
             float posX = startX + (j * diameter);
 
-            PhysicEntity* phent = CreateEntity<PhysicEntity>(radius, Color::Red);
-            phent->SetPosition({ posX, posY });
+            Color colorRand = { (uint8)(std::rand() % 256), (uint8)(std::rand() % 256), (uint8)(std::rand() % 256) };
 
-            if (color)
-            {
-                phent->SetColor(Color::Yellow);
-                color = false;
-            }
-            else
-            {
-                color = true;
-            }
+            PhysicEntity* phent = CreateEntity<PhysicEntity>(radius, colorRand);
+            phent->SetPosition({ posX, posY });
+            phent->SetAcceleration(m_gravity);
+
+            //if (color)
+            //{
+            //    phent->SetColor(Color::Yellow);
+            //    color = false;
+            //}
+            //else
+            //{
+            //    color = true;
+            //}
             m_phEnt.push_back(phent);
         }
     }
@@ -125,6 +129,7 @@ void SampleScene::OnInitialize()
     whiteBall->SetPosition({wWidth * 0.5f, wHeight * 0.8f });
     whiteBall->SetDestroy(false);
     whiteBall->SetSpawnPoint(whiteBall->GetPosition());
+    whiteBall->SetAcceleration(m_gravity);
     m_phEnt.push_back(whiteBall);
 
     m_viseur.a = { 0, 0 };

@@ -31,16 +31,16 @@ void PhysicEntity::OnUpdate()
 
 void PhysicEntity::OnCollision(Entity* other)
 {
-    if (other->IsFixed())
-    {
-        if (m_destroyOK)
-        {
-            Destroy();
-        }
-        else
-        {
-            SetPosition(m_spawnPOs);
-            m_velocity = { 0, 0 };
-        }
-    }
+    //if (other->IsFixed())
+    //{
+    //    if (m_destroyOK)
+    //    {
+    //        Destroy();
+    //    }
+    //    else
+    //    {
+    //        SetPosition(m_spawnPOs);
+    //        m_velocity = { 0, 0 };
+    //    }
+    //}
 }

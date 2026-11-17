@@ -16,6 +16,7 @@ protected:
     bool mToDestroy = false;
     Vector2f m_velocity;
     bool m_fixed = false;
+    Vector2f m_acceleration = {0, 0};
 
 public:
     void SetPosition(Vector2f position, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -48,6 +49,10 @@ public:
     void SetIsFixed(bool p_fixed) { m_fixed = p_fixed; }
     bool IsFixed() { return m_fixed; }
 
+    void AddImpulsion(Vector2f p_impulsion) { m_velocity += p_impulsion; }
+    void SetAcceleration(Vector2f p_acceleration) { m_acceleration = p_acceleration; }
+    Vector2f GetAcceleration() { return m_acceleration; }
+
 protected:
     Entity() = default;
     virtual ~Entity() = default;
@@ -61,6 +66,8 @@ private:
     void Update();
     void Draw(SDL_Renderer* renderer) const;
     void Initialize(float radius, const Color& color);
+
+    void FixeUpdate(float dt);
 
     friend class GameManager;
     friend class Scene;

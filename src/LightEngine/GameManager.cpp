@@ -11,6 +11,7 @@
 #include <SDL_ttf.h>
 
 #include <algorithm>
+#include <stdlib.h>
 
 
 GameManager::GameManager()
@@ -24,6 +25,7 @@ GameManager::GameManager()
     mWindowWidth = -1;
     mWindowHeight = -1;
     mClearColor = Color::Black;
+    srand(NULL);
 }
 
 GameManager* GameManager::Get()
@@ -41,6 +43,50 @@ void GameManager::CreateLine(Line& p_line)
 void GameManager::CreateRectangle(Rectangle& p_rectangle)
 {
     m_rectangles.push_back(&p_rectangle);
+}
+
+void GameManager::FixeUpdate(float dt)
+{
+    for (Entity* ent : mEntities)
+    {
+        ent->FixeUpdate(dt);
+    }
+
+    for (auto it1 = mEntities.begin(); it1 != mEntities.end(); ++it1)
+    {
+        Entity* entity = *it1;
+
+        if (entity->IsFixed() == false)
+        {
+            ResolveCollisionWithLine(entity);
+            ResolveCollisionARC(entity);
+        }
+
+        auto it2 = it1;
+        ++it2;
+        for (; it2 != mEntities.end(); ++it2)
+        {
+            Entity* otherEntity = *it2;
+
+            if (entity->IsFixed() || otherEntity->IsFixed())
+            {
+                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                if (ResolveColisionCBC(entity, otherEntity) == false)
+                {
+                    continue;
+                }
+            }
+
+            entity->OnCollision(otherEntity);
+            otherEntity->OnCollision(entity);
+        }
+    }
 }
 
 void GameManager::ResolveCollisionWithLine(Entity* p_entity)
@@ -114,6 +160,10 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
     {
         Vector2f bottomRightRect = rect->position + rect->size;
         // si rentre dans le if alors il est a l'interieur du rect
+
+        // Améliorer en vérifiant la distance
+        // avec le claused point si il renvoie la pos du cercle alors il est dans le rect
+
         if (topLeft.x >= rect->position.x && topLeft.y >= rect->position.y && bottomRight.x <= bottomRightRect.x && bottomRight.y <= bottomRightRect.y)
         {
             float leftSide = centerA.x - rect->position.x;
@@ -312,6 +362,8 @@ void GameManager::Run()
 
         Update();
 
+        UpdatePhysics();
+
         Draw();
     }
 }
@@ -329,44 +381,6 @@ void GameManager::Update()
             entity->Update();
     }
 
-    //Collision
-    for (auto it1 = mEntities.begin(); it1 != mEntities.end(); ++it1)
-    {
-        Entity* entity = *it1;
-
-        if (entity->IsFixed() == false)
-        {
-            ResolveCollisionWithLine(entity);
-            ResolveCollisionARC(entity);
-        }
-
-        auto it2 = it1;
-        ++it2;
-        for (; it2 != mEntities.end(); ++it2)
-        {
-            Entity* otherEntity = *it2;
-
-            if (entity->IsFixed() || otherEntity->IsFixed())
-            {
-                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                if (ResolveColisionCBC(entity, otherEntity) == false)
-                {
-                    continue;
-                }
-            }
-            //#TODO
-
-            entity->OnCollision(otherEntity);
-            otherEntity->OnCollision(entity);
-        }
-    }
-
     for (auto it = mEntities.begin(); it != mEntities.end(); )
     {
         Entity* entity = *it;
@@ -379,6 +393,17 @@ void GameManager::Update()
 
         delete entity;
         it = mEntities.erase(it);
+    }
+}
+
+void GameManager::UpdatePhysics()
+{
+    float dt = GetDeltaTime();
+    m_acc += dt;
+    while (m_acc >= m_fixedDt)
+    {
+        FixeUpdate(m_fixedDt);
+        m_acc -= m_fixedDt;
     }
 }
 

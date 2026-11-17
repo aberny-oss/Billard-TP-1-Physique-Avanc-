@@ -32,6 +32,9 @@ class GameManager
 
     float mDeltaTime;
 
+    const float m_fixedDt = 1 / 240.0f;
+    float m_acc = 0.f;
+
     int mWindowWidth;
     int mWindowHeight;
 
@@ -45,6 +48,7 @@ private:
     bool Initialize(int width, int height, const char* title, Color clearColor);
     void Run();
     void Update();
+    void UpdatePhysics();
     void Draw();
 
     void SetDeltaTime(uint64 deltaTimeNS) { mDeltaTime = static_cast<float>(deltaTimeNS) / 1000000000.f; }
@@ -72,6 +76,8 @@ public:
 
     void CreateLine(Line& p_line);
     void CreateRectangle(Rectangle& p_rectangle);
+
+    void FixeUpdate(float dt);
 
     friend class Scene;
 };
