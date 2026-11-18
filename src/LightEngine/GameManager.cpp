@@ -68,25 +68,20 @@ void GameManager::FixeUpdate(float dt)
         {
             Entity* otherEntity = *it2;
 
-
-            if (ResolveColisionCBC(entity, otherEntity) == false)
+            if (entity->IsFixed() || otherEntity->IsFixed())
             {
-                continue;
+                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+                {
+                    continue;
+                }
             }
-            //if (entity->IsFixed() || otherEntity->IsFixed())
-            //{
-            //    if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
-            //    {
-            //        continue;
-            //    }
-            //}
-            //else
-            //{
-            //    if (ResolveColisionCBC(entity, otherEntity) == false)
-            //    {
-            //        continue;
-            //    }
-            //}
+            else
+            {
+                if (ResolveColisionCBC(entity, otherEntity) == false)
+                {
+                    continue;
+                }
+            }
 
             entity->OnCollision(otherEntity);
             otherEntity->OnCollision(entity);
@@ -161,6 +156,8 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
     Vector2f topLeft = p_entA->GetPosition(0, 0);
     Vector2f bottomRight = p_entA->GetPosition(1, 1);
 
+    float facteurdeglissement = 0.4f;
+
     for (Rectangle* rect : m_rectangles)
     {
         Vector2f bottomRightRect = rect->position + rect->size;
@@ -202,7 +199,8 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
             float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
             Vector2f vn = normal * dotVel;
             Vector2f vt = p_entA->m_velocity - vn;
-            p_entA->m_velocity = -1 * vn + vt;
+            p_entA->m_velocity = -1 * (vn * facteurdeglissement) + vt;
+
         }
         else
         {
@@ -222,7 +220,7 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
                 float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
                 Vector2f vn = normal * dotVel;
                 Vector2f vt = p_entA->m_velocity - vn;
-                p_entA->m_velocity = -1 * vn + vt;
+                p_entA->m_velocity = -1 * (vn * facteurdeglissement) + vt;
             }
         }
     }

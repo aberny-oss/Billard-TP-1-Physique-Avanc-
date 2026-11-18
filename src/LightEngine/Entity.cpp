@@ -23,7 +23,7 @@ void Entity::Initialize(float radius, const Color& color)
 
 void Entity::FixeUpdate(float dt)
 {
-    m_velocity += m_acceleration * dt;
+    m_velocity += m_mass * m_acceleration * dt;
     if (m_velocity.Magnitude() < 3.0f)
     {
         m_velocity = { 0, 0 };
