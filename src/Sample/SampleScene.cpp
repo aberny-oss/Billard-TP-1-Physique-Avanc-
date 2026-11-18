@@ -148,94 +148,178 @@ void SampleScene::OnUpdate()
     InputManager* im = InputManager::Get();
     const Vector2f mousePos = im->GetMousePosition();
 
-    bool selectedent = false;
-    if (im->IsMouseDown(SDL_BUTTON_RIGHT))
+    //spawn boule mass 1
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_1))
     {
-        for (PhysicEntity* phent : m_phEnt)
-        {
-            if (phent->IsPointInside(mousePos))
-            {
-                if (m_selectedPHEnt)
-                {
-                    //m_selectedPHEnt->SetColor(Color::Red);
-                }
-                m_selectedPHEnt = phent;
-                //m_selectedPHEnt->SetColor(Color::Cyan);
-                selectedent = true;
-                break;
-            }
-            else
-            {
-                if (m_selectedPHEnt)
-                {
-                    //m_selectedPHEnt->SetColor(Color::Red);
-                    m_selectedPHEnt = nullptr;
-                }
-            }
-        }
-        if (selectedent)
-        {
-            return;
-        }
+        Color colorRand = Color::Red;
+        int radius = 5 + std::rand() % (20 - 5 + 1);
+        float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
 
-        if (m_selectedPHEnt)
-        {
-            //Vector2f center = m_selectedPHEnt->GetPosition();
-
-            //m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() + (mousePos - center) * 0.69f);
-        }
+        PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
+        ent->SetPosition({ mousePos.x, mousePos.y });
+        ent->SetAcceleration(m_gravity);
+        ent->SetMass(1);
+        ent->SetCoefRestitution(restitution);
+        m_phEnt.push_back(ent);
     }
-    if (im->IsMouseHeld(SDL_BUTTON_LEFT))
+    //spawn boule mass 2
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_2))
     {
-        if (m_selectedPHEnt)
-        {
-            if (m_upOrDown == false)
-            {
-                m_timerToHeld += dt;
-                if (m_timerToHeld > m_maxTimeToHeld)
-                {
-                    m_upOrDown = true;
-                }
-            }
-            else
-            {
-                m_timerToHeld -= dt;
-                if (m_timerToHeld < 0.0f)
-                {
-                    m_upOrDown = false;
-                }
-            }
+        Color colorRand = Color::Orange;
+        int radius = 5 + std::rand() % (20 - 5 + 1);
+        float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
 
-            Vector2f center = m_selectedPHEnt->GetPosition();
-
-            Vector2f dir = mousePos - center;
-            dir.Normalize();
-
-            float distance = m_timerToHeld * (m_facteurPower * 0.3f);
-
-            m_viseur.a = center;
-            m_viseur.b = center - dir * distance;
-        }
+        PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
+        ent->SetPosition({ mousePos.x, mousePos.y });
+        ent->SetAcceleration(m_gravity);
+        ent->SetMass(2);
+        ent->SetCoefRestitution(restitution);
+        m_phEnt.push_back(ent);
     }
-    if (im->IsMouseUp(SDL_BUTTON_LEFT))
+    //spawn boule mass 3
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_3))
     {
-        if (m_selectedPHEnt)
-        {
-            Vector2f center = m_selectedPHEnt->GetPosition();
+        Color colorRand = Color::Yellow;
+        int radius = 5 + std::rand() % (20 - 5 + 1);
+        float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
 
-            Vector2f dir = mousePos - center;
-            dir.Normalize();
-
-            float distance = m_timerToHeld * m_facteurPower;
-            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
-
-            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
-            m_timerToHeld = 0.0;
-
-            m_viseur.a = {0, 0};
-            m_viseur.b = { 0, 0 };
-        }
+        PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
+        ent->SetPosition({ mousePos.x, mousePos.y });
+        ent->SetAcceleration(m_gravity);
+        ent->SetMass(3);
+        ent->SetCoefRestitution(restitution);
+        m_phEnt.push_back(ent);
     }
+    //spawn boule mass 4
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_4))
+    {
+        Color colorRand = Color::Green;
+        int radius = 5 + std::rand() % (20 - 5 + 1);
+        float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
+
+        PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
+        ent->SetPosition({ mousePos.x, mousePos.y });
+        ent->SetAcceleration(m_gravity);
+        ent->SetMass(4);
+        ent->SetCoefRestitution(restitution);
+        m_phEnt.push_back(ent);
+    }
+    //spawn boule mass 5
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_5))
+    {
+        Color colorRand = Color::Cyan;
+        int radius = 5 + std::rand() % (20 - 5 + 1);
+        float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
+
+        PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
+        ent->SetPosition({ mousePos.x, mousePos.y });
+        ent->SetAcceleration(m_gravity);
+        ent->SetMass(5);
+        ent->SetCoefRestitution(restitution);
+        m_phEnt.push_back(ent);
+    }
+    //spawn boule mass 6
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_6))
+    {
+
+    }
+    //spawn boule mass 7
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_7))
+    {
+
+    }
+    //spawn boule mass 8
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_8))
+    {
+
+    }
+    //spawn boule mass 9
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_9))
+    {
+
+    }
+    //spawn boule mass 10
+    if (im->IsMouseHeld(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_10))
+    {
+
+    }
+
+    //bool selectedent = false;
+    //if (im->IsMouseDown(SDL_BUTTON_RIGHT))
+    //{
+    //    for (PhysicEntity* phent : m_phEnt)
+    //    {
+    //        if (phent->IsPointInside(mousePos))
+    //        {
+    //            if (m_selectedPHEnt)
+    //            {
+    //                //m_selectedPHEnt->SetColor(Color::Red);
+    //            }
+    //            m_selectedPHEnt = phent;
+    //            //m_selectedPHEnt->SetColor(Color::Cyan);
+    //            selectedent = true;
+    //            break;
+    //        }
+    //        else
+    //        {
+    //            if (m_selectedPHEnt)
+    //            {
+    //                //m_selectedPHEnt->SetColor(Color::Red);
+    //                m_selectedPHEnt = nullptr;
+    //            }
+    //        }
+    //    }
+    //    if (selectedent)
+    //    {
+    //        return;
+    //    }
+    //    if (m_selectedPHEnt)
+    //    {
+    //    }
+    //}
+    //if (im->IsMouseHeld(SDL_BUTTON_LEFT))
+    //{
+    //    if (m_selectedPHEnt)
+    //    {
+    //        if (m_upOrDown == false)
+    //        {
+    //            m_timerToHeld += dt;
+    //            if (m_timerToHeld > m_maxTimeToHeld)
+    //            {
+    //                m_upOrDown = true;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            m_timerToHeld -= dt;
+    //            if (m_timerToHeld < 0.0f)
+    //            {
+    //                m_upOrDown = false;
+    //            }
+    //        }
+    //        Vector2f center = m_selectedPHEnt->GetPosition();
+    //        Vector2f dir = mousePos - center;
+    //        dir.Normalize();
+    //        float distance = m_timerToHeld * (m_facteurPower * 0.3f);
+    //        m_viseur.a = center;
+    //        m_viseur.b = center - dir * distance;
+    //    }
+    //}
+    //if (im->IsMouseUp(SDL_BUTTON_LEFT))
+    //{
+    //    if (m_selectedPHEnt)
+    //    {
+    //        Vector2f center = m_selectedPHEnt->GetPosition();
+    //        Vector2f dir = mousePos - center;
+    //        dir.Normalize();
+    //        float distance = m_timerToHeld * m_facteurPower;
+    //        m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
+    //        m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
+    //        m_timerToHeld = 0.0;
+    //        m_viseur.a = {0, 0};
+    //        m_viseur.b = { 0, 0 };
+    //    }
+    //}
     int WindowW = GetWindowWidth();
     int WindowH = GetWindowHeight();
 
