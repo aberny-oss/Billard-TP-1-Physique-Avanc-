@@ -89,14 +89,14 @@ void SampleScene::OnInitialize()
     gm->CreateRectangle(m_rectRight);
 
 
-    float radius = 10.0f;
+    float radius = 20;
     float diameter = radius * 2.0f;
     float rowHeight = radius * std::sqrt(3.0f); 
 
     Vector2f placeFirst = { wWidth * 0.5f, wHeight * 0.4f };
 
     bool color = false;
-    for (int i = 0; i < 15; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         float startX = placeFirst.x - (i * radius);
         float posY = placeFirst.y - (i * rowHeight);
@@ -110,6 +110,7 @@ void SampleScene::OnInitialize()
             PhysicEntity* phent = CreateEntity<PhysicEntity>(radius, colorRand);
             phent->SetPosition({ posX, posY });
             phent->SetAcceleration(m_gravity);
+            phent->SetMass(5);
 
             //if (color)
             //{
@@ -125,11 +126,12 @@ void SampleScene::OnInitialize()
     }
 
     //White ball
-    PhysicEntity* whiteBall = CreateEntity<PhysicEntity>(holeRadius, Color::White);
-    whiteBall->SetPosition({wWidth * 0.5f, wHeight * 0.8f });
+    PhysicEntity* whiteBall = CreateEntity<PhysicEntity>(25, Color::White);
+    whiteBall->SetPosition({wWidth * 0.3f, wHeight * 0.8f });
     whiteBall->SetDestroy(false);
     whiteBall->SetSpawnPoint(whiteBall->GetPosition());
     whiteBall->SetAcceleration(m_gravity);
+    whiteBall->SetMass(1);
     m_phEnt.push_back(whiteBall);
 
     m_viseur.a = { 0, 0 };

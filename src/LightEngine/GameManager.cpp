@@ -68,20 +68,25 @@ void GameManager::FixeUpdate(float dt)
         {
             Entity* otherEntity = *it2;
 
-            if (entity->IsFixed() || otherEntity->IsFixed())
+
+            if (ResolveColisionCBC(entity, otherEntity) == false)
             {
-                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
-                {
-                    continue;
-                }
+                continue;
             }
-            else
-            {
-                if (ResolveColisionCBC(entity, otherEntity) == false)
-                {
-                    continue;
-                }
-            }
+            //if (entity->IsFixed() || otherEntity->IsFixed())
+            //{
+            //    if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
+            //    {
+            //        continue;
+            //    }
+            //}
+            //else
+            //{
+            //    if (ResolveColisionCBC(entity, otherEntity) == false)
+            //    {
+            //        continue;
+            //    }
+            //}
 
             entity->OnCollision(otherEntity);
             otherEntity->OnCollision(entity);
@@ -228,8 +233,7 @@ bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
     //Correction Position de A en mouvement et B fixe
     Vector2f AB = p_entB->GetPosition() - p_entA->GetPosition();
     float distance = AB.Magnitude();
-    AB.Normalize();
-    Vector2f normal = AB;
+    Vector2f normal = AB.Normalized();
     float overlap = p_entA->GetRadius() + p_entB->GetRadius() - distance;
     if (overlap > 0.0f) // collision
     {
@@ -240,13 +244,38 @@ bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
         Vector2f newPosB = { p_entB->GetPosition().x + normal.x * demiOverlap, p_entB->GetPosition().y + normal.y * demiOverlap };
         p_entB->SetPosition(newPosB);
 
-        Vector2f vnA = normal * Vector2f::Dot(p_entA->m_velocity, normal);
-        Vector2f vtA = p_entA->m_velocity - vnA;
-        Vector2f vnB = normal * Vector2f::Dot(p_entB->m_velocity, normal);
-        Vector2f vtB = p_entB->m_velocity - vnB;
 
-        p_entA->m_velocity = vnB + vtA;
-        p_entB->m_velocity = vnA + vtB;
+        Vector2f VelocityRelativeBA = p_entA->m_velocity - p_entB->m_velocity;
+        float rapprochement = Vector2f::Dot(VelocityRelativeBA, normal);
+
+        //vector stockant la modification de la velocité de la collision a ajouter a la vélocité de l'objet
+        Vector2f CollisionVelA = { 0, 0 };
+        Vector2f CollisionVelB = { 0, 0 };
+
+        float massTotal = p_entA->GetMass() + p_entB->GetMass();
+        float ratioA = (p_entA->GetMass() / massTotal);
+        float ratioB = 1.f - ratioA;
+
+        //étape 1 anuller le raprochement
+        CollisionVelA -= normal * (rapprochement * (1 - ratioA));
+        CollisionVelB += normal * (rapprochement * (1 - ratioB));
+
+        //ajouter la velocité d'éloignement de moitier pour chacun
+        CollisionVelA = { CollisionVelA.x * 2, CollisionVelA.y * 2 };
+        CollisionVelB = { CollisionVelB.x * 2, CollisionVelB.y * 2 };;
+
+        p_entA->m_velocity += CollisionVelA;
+        p_entB->m_velocity += CollisionVelB;
+
+
+
+        //Vector2f vnA = normal * Vector2f::Dot(p_entA->m_velocity, normal);
+        //Vector2f vtA = p_entA->m_velocity - vnA;
+        //Vector2f vnB = normal * Vector2f::Dot(p_entB->m_velocity, normal);
+        //Vector2f vtB = p_entB->m_velocity - vnB;
+
+        //p_entA->m_velocity = vnB + vtA;
+        //p_entB->m_velocity = vnA + vtB;
 
         return true;
     }

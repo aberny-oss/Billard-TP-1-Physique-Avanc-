@@ -17,6 +17,7 @@ protected:
     Vector2f m_velocity;
     bool m_fixed = false;
     Vector2f m_acceleration = {0, 0};
+    float m_mass = 1.0f;
 
 public:
     void SetPosition(Vector2f position, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -50,8 +51,12 @@ public:
     bool IsFixed() { return m_fixed; }
 
     void AddImpulsion(Vector2f p_impulsion) { m_velocity += p_impulsion; }
+
     void SetAcceleration(Vector2f p_acceleration) { m_acceleration = p_acceleration; }
     Vector2f GetAcceleration() { return m_acceleration; }
+
+    void SetMass(float p_mass) { m_mass = p_mass; }
+    float GetMass() { return m_mass; }
 
 protected:
     Entity() = default;

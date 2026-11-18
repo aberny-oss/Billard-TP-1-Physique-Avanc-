@@ -5,7 +5,7 @@
 
 PhysicEntity::PhysicEntity()
 {
-    m_decelerationSpeed = 444;
+    m_decelerationSpeed = 350;
 }
 
 void PhysicEntity::OnInitialize()
