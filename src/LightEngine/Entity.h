@@ -18,6 +18,7 @@ protected:
     bool m_fixed = false;
     Vector2f m_acceleration = {0, 0};
     float m_mass = 1.0f;
+    float m_restitution = 1.0f;
 
 public:
     void SetPosition(Vector2f position, float ratioX = 0.5f, float ratioY = 0.5f);
@@ -57,6 +58,9 @@ public:
 
     void SetMass(float p_mass) { m_mass = p_mass; }
     float GetMass() { return m_mass; }
+
+    void SetCoefRestitution(float p_coef) { m_restitution = p_coef; }
+    float GetCoefRestitution() { return m_restitution; }
 
 protected:
     Entity() = default;

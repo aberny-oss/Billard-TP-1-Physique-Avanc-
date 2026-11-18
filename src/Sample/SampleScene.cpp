@@ -111,7 +111,7 @@ void SampleScene::OnInitialize()
             phent->SetPosition({ posX, posY });
             phent->SetAcceleration(m_gravity);
             phent->SetMass(5);
-
+            phent->SetCoefRestitution(0.1);
             //if (color)
             //{
             //    phent->SetColor(Color::Yellow);
@@ -132,6 +132,7 @@ void SampleScene::OnInitialize()
     whiteBall->SetSpawnPoint(whiteBall->GetPosition());
     whiteBall->SetAcceleration(m_gravity);
     whiteBall->SetMass(1);
+    whiteBall->SetCoefRestitution(0.4);
     m_phEnt.push_back(whiteBall);
 
     m_viseur.a = { 0, 0 };
@@ -184,7 +185,6 @@ void SampleScene::OnUpdate()
             //m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() + (mousePos - center) * 0.69f);
         }
     }
-
     if (im->IsMouseHeld(SDL_BUTTON_LEFT))
     {
         if (m_selectedPHEnt)

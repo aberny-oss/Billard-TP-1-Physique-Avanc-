@@ -250,17 +250,20 @@ bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
         Vector2f CollisionVelA = { 0, 0 };
         Vector2f CollisionVelB = { 0, 0 };
 
-        float massTotal = p_entA->GetMass() + p_entB->GetMass();
-        float ratioA = (p_entA->GetMass() / massTotal);
+        float massTotal = p_entA->m_mass + p_entB->m_mass;
+        float ratioA = (p_entA->m_mass / massTotal);
         float ratioB = 1.f - ratioA;
 
         //étape 1 anuller le raprochement
         CollisionVelA -= normal * (rapprochement * (1 - ratioA));
         CollisionVelB += normal * (rapprochement * (1 - ratioB));
 
+        float totalRestitution = p_entA->m_restitution + p_entB->m_restitution;
+        float moyenne = totalRestitution / 2;
+
         //ajouter la velocité d'éloignement de moitier pour chacun
-        CollisionVelA = { CollisionVelA.x * 2, CollisionVelA.y * 2 };
-        CollisionVelB = { CollisionVelB.x * 2, CollisionVelB.y * 2 };;
+        CollisionVelA = { CollisionVelA.x * (1 + moyenne), CollisionVelA.y * (1 + moyenne) };
+        CollisionVelB = { CollisionVelB.x * (1 + moyenne), CollisionVelB.y * (1 + moyenne) };
 
         p_entA->m_velocity += CollisionVelA;
         p_entB->m_velocity += CollisionVelB;
