@@ -124,18 +124,18 @@ void GravityScene::OnInitialize()
         }
     }
 
-    //White ball
-    PhysicEntity* whiteBall = CreateEntity<PhysicEntity>(holeRadius, Color::White);
-    whiteBall->SetPosition({ wWidth * 0.5f, wHeight * 0.8f });
-    whiteBall->SetDestroy(false);
-    whiteBall->SetSpawnPoint(whiteBall->GetPosition());
-    whiteBall->SetAcceleration(m_gravity);
-    m_phEnt.push_back(whiteBall);
+    ////White ball
+    //PhysicEntity* whiteBall = CreateEntity<PhysicEntity>(holeRadius, Color::White);
+    //whiteBall->SetPosition({ wWidth * 0.5f, wHeight * 0.8f });
+    //whiteBall->SetDestroy(false);
+    //whiteBall->SetSpawnPoint(whiteBall->GetPosition());
+    //whiteBall->SetAcceleration(m_gravity);
+    //m_phEnt.push_back(whiteBall);
 
     m_viseur.a = { 0, 0 };
     m_viseur.b = { 0, 0 };
 
-    m_selectedPHEnt = whiteBall;
+    //m_selectedPHEnt = whiteBall;
 }
 
 void GravityScene::OnUpdate()

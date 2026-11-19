@@ -14,18 +14,18 @@ void PhysicEntity::OnInitialize()
 
 void PhysicEntity::OnUpdate()
 {
-    float dt = GetDeltaTime();
-    float decel = m_decelerationSpeed * dt;
+    //float dt = GetDeltaTime();
+    //float decel = m_decelerationSpeed * dt;
 
-    float speed = m_velocity.Magnitude();
-    float newSpeed = speed - decel;
+    //float speed = m_velocity.Magnitude();
+    //float newSpeed = speed - decel;
 
-    if(speed > 0)
-        m_velocity = m_velocity * (newSpeed / speed);
-    //m_velocity.x = std::max(m_velocity.x , 0.0f);
-    //m_velocity.y = std::max(m_velocity.y, 0.0f);
+    //if(speed > 0)
+    //    m_velocity = m_velocity * (newSpeed / speed);
+    ////m_velocity.x = std::max(m_velocity.x , 0.0f);
+    ////m_velocity.y = std::max(m_velocity.y, 0.0f);
 
-    int a = 0;
+    //int a = 0;
 
 }
 

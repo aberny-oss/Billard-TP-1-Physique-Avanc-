@@ -215,17 +215,17 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
             Vector2f direction = closestPoint - centerA;
             float distance = direction.Magnitude();
 
-            if (distance < radiusA) // collision
-            {
-                Vector2f normal = direction.Normalized();
-                float overlap = radiusA - distance;
-                p_entA->SetPosition(p_entA->GetPosition() - normal * overlap);
+            if (distance >= radiusA) // collision
+                continue;
 
-                float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
-                Vector2f vn = normal * dotVel;
-                Vector2f vt = p_entA->m_velocity - vn;
-                p_entA->m_velocity = -1 * (vn * facteurdeglissement) + vt;
-            }
+            Vector2f normal = direction.Normalized();
+            float overlap = radiusA - distance;
+            p_entA->SetPosition(p_entA->GetPosition() - normal * overlap);
+
+            float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
+            Vector2f vn = normal * dotVel;
+            Vector2f vt = p_entA->m_velocity - vn;
+            p_entA->m_velocity = -1 * (vn * facteurdeglissement) + vt;
         }
     }
 }

@@ -24,41 +24,41 @@ void MassScene::OnInitialize()
     float holeRadius = 15;
     float margin = 6;
 
-    //up left
-    PhysicEntity* upLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    upLeft->SetPosition(topLeft + margin, 0, 0);
-    upLeft->SetIsFixed(true);
-    m_phEnt.push_back(upLeft);
+    ////up left
+    //PhysicEntity* upLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
+    //upLeft->SetPosition(topLeft + margin, 0, 0);
+    //upLeft->SetIsFixed(true);
+    //m_phEnt.push_back(upLeft);
 
-    // up right
-    PhysicEntity* upRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    upRight->SetPosition({ topRight.x - margin, topRight.y + margin }, 1, 0);
-    upRight->SetIsFixed(true);
-    m_phEnt.push_back(upRight);
+    //// up right
+    //PhysicEntity* upRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
+    //upRight->SetPosition({ topRight.x - margin, topRight.y + margin }, 1, 0);
+    //upRight->SetIsFixed(true);
+    //m_phEnt.push_back(upRight);
 
-    //down left
-    PhysicEntity* downleft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    downleft->SetPosition({ bottomLeft.x + margin, bottomLeft.y - margin }, 0, 1);
-    downleft->SetIsFixed(true);
-    m_phEnt.push_back(downleft);
+    ////down left
+    //PhysicEntity* downleft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
+    //downleft->SetPosition({ bottomLeft.x + margin, bottomLeft.y - margin }, 0, 1);
+    //downleft->SetIsFixed(true);
+    //m_phEnt.push_back(downleft);
 
-    //down right
-    PhysicEntity* downRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    downRight->SetPosition(bottomRight - margin, 1, 1);
-    downRight->SetIsFixed(true);
-    m_phEnt.push_back(downRight);
+    ////down right
+    //PhysicEntity* downRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
+    //downRight->SetPosition(bottomRight - margin, 1, 1);
+    //downRight->SetIsFixed(true);
+    //m_phEnt.push_back(downRight);
 
-    //midle left
-    PhysicEntity* midleLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    midleLeft->SetPosition({ bottomLeft.x * 0.5f + margin, bottomLeft.y * 0.5f }, 0, 0.5f);
-    midleLeft->SetIsFixed(true);
-    m_phEnt.push_back(midleLeft);
+    ////midle left
+    //PhysicEntity* midleLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
+    //midleLeft->SetPosition({ bottomLeft.x * 0.5f + margin, bottomLeft.y * 0.5f }, 0, 0.5f);
+    //midleLeft->SetIsFixed(true);
+    //m_phEnt.push_back(midleLeft);
 
-    //midle right
-    PhysicEntity* midleRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    midleRight->SetPosition({ bottomRight.x - margin, bottomRight.y * 0.5f }, 1, 0.5f);
-    midleRight->SetIsFixed(true);
-    m_phEnt.push_back(midleRight);
+    ////midle right
+    //PhysicEntity* midleRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
+    //midleRight->SetPosition({ bottomRight.x - margin, bottomRight.y * 0.5f }, 1, 0.5f);
+    //midleRight->SetIsFixed(true);
+    //m_phEnt.push_back(midleRight);
 
     //rect up
     m_rectUp.position = topLeft;
@@ -125,20 +125,20 @@ void MassScene::OnInitialize()
         }
     }
 
-    //White ball
-    PhysicEntity* whiteBall = CreateEntity<PhysicEntity>(33, Color::White);
-    whiteBall->SetPosition({ wWidth * 0.3f, wHeight * 0.8f });
-    whiteBall->SetDestroy(false);
-    whiteBall->SetSpawnPoint(whiteBall->GetPosition());
-    whiteBall->SetAcceleration(m_gravity);
-    whiteBall->SetMass(1);
-    whiteBall->SetCoefRestitution(0.4);
-    m_phEnt.push_back(whiteBall);
+    ////White ball
+    //PhysicEntity* whiteBall = CreateEntity<PhysicEntity>(33, Color::White);
+    //whiteBall->SetPosition({ wWidth * 0.3f, wHeight * 0.8f });
+    //whiteBall->SetDestroy(false);
+    //whiteBall->SetSpawnPoint(whiteBall->GetPosition());
+    //whiteBall->SetAcceleration(m_gravity);
+    //whiteBall->SetMass(1);
+    //whiteBall->SetCoefRestitution(0.4);
+    //m_phEnt.push_back(whiteBall);
 
-    m_viseur.a = { 0, 0 };
-    m_viseur.b = { 0, 0 };
+    //m_viseur.a = { 0, 0 };
+    //m_viseur.b = { 0, 0 };
 
-    m_selectedPHEnt = whiteBall;
+    //m_selectedPHEnt = whiteBall;
 }
 
 void MassScene::OnUpdate()

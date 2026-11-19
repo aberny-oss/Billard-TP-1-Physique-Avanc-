@@ -26,7 +26,7 @@ class MassScene : public Scene
 
     float m_facteurPower = 666;
 
-    const float m_ratioMP = 100.0f; // 1m = 100pixels
+    const float m_ratioMP = 10.0f; // 1m = 100pixels
     Vector2f m_gravity = { 0.f, 9.81f * m_ratioMP };
 
 public:
