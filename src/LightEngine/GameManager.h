@@ -32,7 +32,7 @@ class GameManager
 
     float mDeltaTime;
 
-    const float m_fixedDt = 1 / 60.0f;
+    const float m_fixedDt = 1 / 240.0f;
     float m_acc = 0.f;
 
     int mWindowWidth;
