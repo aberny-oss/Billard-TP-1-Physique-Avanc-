@@ -10,8 +10,8 @@ int main()
 
     //game->LaunchScene<BillardScene>(640, 960, "BillardScene", Color{ 45, 45, 62 });
     //game->LaunchScene<GravityScene>(640, 960, "GravityScene", Color{ 45, 45, 62 });
-    game->LaunchScene<MassScene>(800, 750, "MassScene", Color{ 45, 45, 62 });
-    //game->LaunchScene<SampleScene>(900, 850, "SampleScene", Color{ 45, 45, 62 });
+    //game->LaunchScene<MassScene>(800, 750, "MassScene", Color{ 45, 45, 62 });
+    game->LaunchScene<SampleScene>(900, 850, "SampleScene", Color{ 45, 45, 62 });
 
 
     return 0;
