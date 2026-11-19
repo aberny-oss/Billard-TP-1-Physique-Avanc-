@@ -32,7 +32,7 @@ class GameManager
 
     float mDeltaTime;
 
-    const float m_fixedDt = 1 / 240.0f;
+    const float m_fixedDt = 1 / 60.0f;
     float m_acc = 0.f;
 
     int mWindowWidth;
@@ -59,6 +59,7 @@ private:
     bool ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB);
     void ResolveCollisionARC(Entity* p_entA);
     bool ResolveColisionCBC(Entity* p_entA, Entity* p_entB);
+    bool ResolveCollisonContinueCBC(Entity* p_entA, Entity* p_entB);
 
 public:
     ~GameManager();

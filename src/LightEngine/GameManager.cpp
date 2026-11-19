@@ -81,6 +81,10 @@ void GameManager::FixeUpdate(float dt)
                 {
                     continue;
                 }
+                //if (ResolveColisionCBC(entity, otherEntity) == false)
+                //{
+                //    continue;
+                //}
             }
 
             entity->OnCollision(otherEntity);
@@ -268,18 +272,13 @@ bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
         p_entA->m_velocity += CollisionVelA;
         p_entB->m_velocity += CollisionVelB;
 
-
-
-        //Vector2f vnA = normal * Vector2f::Dot(p_entA->m_velocity, normal);
-        //Vector2f vtA = p_entA->m_velocity - vnA;
-        //Vector2f vnB = normal * Vector2f::Dot(p_entB->m_velocity, normal);
-        //Vector2f vtB = p_entB->m_velocity - vnB;
-
-        //p_entA->m_velocity = vnB + vtA;
-        //p_entB->m_velocity = vnA + vtB;
-
         return true;
     }
+    return false;
+}
+
+bool GameManager::ResolveCollisonContinueCBC(Entity* p_entA, Entity* p_entB)
+{
     return false;
 }
 
