@@ -77,7 +77,7 @@ void GameManager::FixeUpdate(float dt)
             }
             else
             {
-                if (ResolveColisionCBC(entity, otherEntity) == false)
+                if (ResolveCollisonContinueCBC(entity, otherEntity) == false)
                 {
                     continue;
                 }
@@ -232,7 +232,6 @@ void GameManager::ResolveCollisionARC(Entity* p_entA)
 
 bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
 {
-    //Correction Position de A en mouvement et B fixe
     Vector2f AB = p_entB->GetPosition() - p_entA->GetPosition();
     float distance = AB.Magnitude();
     Vector2f normal = AB.Normalized();
@@ -285,6 +284,72 @@ bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
 
 bool GameManager::ResolveCollisonContinueCBC(Entity* p_entA, Entity* p_entB)
 {
+    Vector2f MouvEntAThisFrame = p_entA->m_velocity * m_fixedDt;
+    Vector2f posA = p_entA->GetPosition();
+    Vector2f normal = (MouvEntAThisFrame - posA).Normalized();
+    Vector2f posB = p_entB->GetPosition();
+    float radiusAB = p_entB->GetRadius() + p_entA->GetRadius();
+    Vector2f AB = posB - posA;
+    // represente la hauteur entre le centre du point b et le point a 90° le plus proche sur le segment du mouvement de A sur cette frame
+    float disCenterBtoMouvA = Vector2f::Dot(AB, normal);
+    if (disCenterBtoMouvA > radiusAB) // collision
+    {
+        return false;
+    }
+
+    float overlap = std::sqrt((radiusAB * radiusAB) - (disCenterBtoMouvA * disCenterBtoMouvA));
+
+    // distance pour la quelle la collision commence car on enleve à la distance du centre de b vers le segment a le décalage pour trouver le debut du chevochement
+    float distancetocollide = Vector2f::Dot(AB, normal) - overlap;
+    float lengthSegmentMouvThisFrame = MouvEntAThisFrame.Magnitude();
+
+    if (0 < distancetocollide && distancetocollide <= MouvEntAThisFrame.Magnitude())
+    {
+        // en gros la proportion de distance a effectué pour que la collision est lieu sur la distance totale du segment de déplacement cette frame
+        float ratioDisToCollide = distancetocollide / lengthSegmentMouvThisFrame;
+
+        float dtImpact = ratioDisToCollide * m_fixedDt; // avance dans le temps (time skip yes i speak english good) donc m_fixeDT - dtImpact = temps restant au passage
+
+        p_entA->SetPosition(posA + p_entA->m_velocity * dtImpact); // on le mouv jusqu'au contacte
+        posA = p_entA->GetPosition();
+
+        Vector2f VelocityRelativeBA = p_entA->m_velocity - p_entB->m_velocity;
+        float rapprochement = Vector2f::Dot(VelocityRelativeBA, normal);
+
+        //pour éviter de les rapprocher si il s'écarte déja car rapprochement est <= a 0
+        if (rapprochement <= 0.0f)
+        {
+            return true;
+        }
+
+        //vector stockant la modification de la velocité de la collision a ajouter a la vélocité de l'objet
+        Vector2f CollisionVelA = { 0, 0 };
+        Vector2f CollisionVelB = { 0, 0 };
+
+        float massTotal = p_entA->m_mass + p_entB->m_mass;
+        float ratioA = (p_entA->m_mass / massTotal);
+        float ratioB = 1.f - ratioA;
+
+        //étape 1 anuller le raprochement
+        CollisionVelA -= normal * (rapprochement * (1 - ratioA));
+        CollisionVelB += normal * (rapprochement * (1 - ratioB));
+
+        float totalRestitution = p_entA->m_restitution + p_entB->m_restitution;
+        float moyenne = totalRestitution / 2;
+
+        //ajouter la velocité d'éloignement de moitier pour chacun
+        CollisionVelA = { CollisionVelA.x * (1 + moyenne), CollisionVelA.y * (1 + moyenne) };
+        CollisionVelB = { CollisionVelB.x * (1 + moyenne), CollisionVelB.y * (1 + moyenne) };
+
+        p_entA->m_velocity += CollisionVelA;
+        p_entB->m_velocity += CollisionVelB;
+
+        //puis en dernier terminer le déplacement restant
+        float dtRestant = m_fixedDt - dtImpact;
+        p_entA->SetPosition(posA + p_entA->m_velocity * dtRestant);
+
+        return true;
+    }
     return false;
 }
 
