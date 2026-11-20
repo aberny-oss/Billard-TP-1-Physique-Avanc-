@@ -7,6 +7,7 @@
 #include <cmath>
 #include <algorithm>
 #include <stdlib.h>
+#include <LightEngine/Utils.h>
 
 void SampleScene::OnInitialize()
 {
@@ -122,212 +123,6 @@ void SampleScene::OnUpdate()
         }
     }
 
-    ////spawn boule mass 1
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_1))
-    //{
-    //    Color colorRand = Color::Red;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(1);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 2
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_2))
-    //{
-    //    Color colorRand = Color::Orange;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(2);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 3
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_3))
-    //{
-    //    Color colorRand = Color::Yellow;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(3);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 4
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_4))
-    //{
-    //    Color colorRand = Color::Green;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(4);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 5
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_5))
-    //{
-    //    Color colorRand = Color::Cyan;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(5);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 6
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_6))
-    //{
-    //    Color colorRand = Color::Blue;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(6);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 7
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_7))
-    //{
-    //    Color colorRand = Color::Magenta;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(7);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 8
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_8))
-    //{
-    //    Color colorRand = Color::Gray;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(8);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 9
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_9))
-    //{
-    //    Color colorRand = Color::Black;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(9);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    ////spawn boule mass 10
-    //if (im->IsMouseDown(SDL_BUTTON_LEFT) && im->IsKeyHeld(SDLK_KP_0))
-    //{
-    //    Color colorRand = Color::White;
-    //    int radius = 5 + std::rand() % (20 - 5 + 1);
-    //    float restitution = 0.1f + (float)(std::rand()) / (float)(RAND_MAX) / (1.0f - 0.1f);
-    //    PhysicEntity* ent = CreateEntity<PhysicEntity>(radius, colorRand);
-    //    ent->SetPosition({ mousePos.x, mousePos.y });
-    //    ent->SetAcceleration(m_gravity);
-    //    ent->SetMass(10);
-    //    ent->SetCoefRestitution(restitution);
-    //    m_phEnt.push_back(ent);
-    //}
-    //bool selectedent = false;
-    //if (im->IsMouseDown(SDL_BUTTON_RIGHT))
-    //{
-    //    for (PhysicEntity* phent : m_phEnt)
-    //    {
-    //        if (phent->IsPointInside(mousePos))
-    //        {
-    //            if (m_selectedPHEnt)
-    //            {
-    //                //m_selectedPHEnt->SetColor(Color::Red);
-    //            }
-    //            m_selectedPHEnt = phent;
-    //            //m_selectedPHEnt->SetColor(Color::Cyan);
-    //            selectedent = true;
-    //            break;
-    //        }
-    //        else
-    //        {
-    //            if (m_selectedPHEnt)
-    //            {
-    //                //m_selectedPHEnt->SetColor(Color::Red);
-    //                m_selectedPHEnt = nullptr;
-    //            }
-    //        }
-    //    }
-    //    if (selectedent)
-    //    {
-    //        return;
-    //    }
-    //    if (m_selectedPHEnt)
-    //    {
-    //    }
-    //}
-    //if (im->IsMouseHeld(SDL_BUTTON_LEFT))
-    //{
-    //    if (m_selectedPHEnt)
-    //    {
-    //        if (m_upOrDown == false)
-    //        {
-    //            m_timerToHeld += dt;
-    //            if (m_timerToHeld > m_maxTimeToHeld)
-    //            {
-    //                m_upOrDown = true;
-    //            }
-    //        }
-    //        else
-    //        {
-    //            m_timerToHeld -= dt;
-    //            if (m_timerToHeld < 0.0f)
-    //            {
-    //                m_upOrDown = false;
-    //            }
-    //        }
-    //        Vector2f center = m_selectedPHEnt->GetPosition();
-    //        Vector2f dir = mousePos - center;
-    //        dir.Normalize();
-    //        float distance = m_timerToHeld * (m_facteurPower * 0.3f);
-    //        m_viseur.a = center;
-    //        m_viseur.b = center - dir * distance;
-    //    }
-    //}
-    //if (im->IsMouseUp(SDL_BUTTON_LEFT))
-    //{
-    //    if (m_selectedPHEnt)
-    //    {
-    //        Vector2f center = m_selectedPHEnt->GetPosition();
-    //        Vector2f dir = mousePos - center;
-    //        dir.Normalize();
-    //        float distance = m_timerToHeld * m_facteurPower;
-    //        m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
-    //        m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() - dir * distance);
-    //        m_timerToHeld = 0.0;
-    //        m_viseur.a = {0, 0};
-    //        m_viseur.b = { 0, 0 };
-    //    }
-    //}
     int WindowW = GetWindowWidth();
     int WindowH = GetWindowHeight();
 
@@ -362,7 +157,20 @@ void SampleScene::OnUpdate()
         Debug::DrawLine(m_viseur.a, m_viseur.b, Color::Red);
     }
 
+    Vector2f lineA = { WindowW * 0.2f, WindowH * 0.1f };
+    Vector2f lineB = { WindowW * 0.8f, WindowH * 0.1f };
+    Debug::DrawLine(lineA, lineB, Color::Green);
 
+    if (m_selectedPHEnt)
+    {
+        m_segmentCollideTest.a = lineA;
+        m_segmentCollideTest.b = lineB;
 
+        m_pointcollideTest.position = m_selectedPHEnt->GetPosition();
+
+        Vector2f pointcoll = Utils::PointIntersecBySegmentAndCircle(m_segmentCollideTest, m_pointcollideTest);
+        Debug::DrawCircle(pointcoll, 5, Color::Red, true);
+    }
+    
 
 }

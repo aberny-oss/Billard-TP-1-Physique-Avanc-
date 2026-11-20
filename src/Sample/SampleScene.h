@@ -30,6 +30,9 @@ class SampleScene : public Scene
     const float m_ratioMP = 100.0f; // 1m = 100pixels
     Vector2f m_gravity = { 0.f, 9.81f * m_ratioMP };
 
+    Circle m_pointcollideTest;
+    Segment m_segmentCollideTest;
+
 public:
     void OnInitialize() override;
     void OnUpdate() override;
