@@ -24,42 +24,6 @@ void SampleScene::OnInitialize()
     float holeRadius = 15;
     float margin = 6;
 
-    ////up left
-    //PhysicEntity* upLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    //upLeft->SetPosition(topLeft + margin,0, 0);
-    //upLeft->SetIsFixed(true);
-    //m_phEnt.push_back(upLeft);
-
-    //// up right
-    //PhysicEntity* upRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    //upRight->SetPosition({ topRight.x - margin, topRight.y + margin }, 1, 0);
-    //upRight->SetIsFixed(true);
-    //m_phEnt.push_back(upRight);
-
-    ////down left
-    //PhysicEntity* downleft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    //downleft->SetPosition({ bottomLeft.x + margin, bottomLeft.y - margin }, 0, 1);
-    //downleft->SetIsFixed(true);
-    //m_phEnt.push_back(downleft);
-
-    ////down right
-    //PhysicEntity* downRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    //downRight->SetPosition(bottomRight - margin, 1, 1);
-    //downRight->SetIsFixed(true);
-    //m_phEnt.push_back(downRight);
-
-    ////midle left
-    //PhysicEntity* midleLeft = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    //midleLeft->SetPosition({ bottomLeft.x * 0.5f + margin, bottomLeft.y * 0.5f }, 0, 0.5f);
-    //midleLeft->SetIsFixed(true);
-    //m_phEnt.push_back(midleLeft);
-
-    ////midle right
-    //PhysicEntity* midleRight = CreateEntity<PhysicEntity>(holeRadius, Color::Black);
-    //midleRight->SetPosition({ bottomRight.x - margin, bottomRight.y * 0.5f }, 1, 0.5f);
-    //midleRight->SetIsFixed(true);
-    //m_phEnt.push_back(midleRight);
-
     float sizeBorderMore = 1000.0f;
 
     //rect up
@@ -112,15 +76,6 @@ void SampleScene::OnInitialize()
             //phent->SetAcceleration(m_gravity);
             phent->SetMass(1);
             phent->SetCoefRestitution(1.0f);
-            //if (color)
-            //{
-            //    phent->SetColor(Color::Yellow);
-            //    color = false;
-            //}
-            //else
-            //{
-            //    color = true;
-            //}
             m_phEnt.push_back(phent);
         }
     }
@@ -144,6 +99,7 @@ void SampleScene::OnInitialize()
 void SampleScene::OnUpdate()
 {
     float dt = GetDeltaTime();
+    float fixedt = GetFixeDeltaTime();
 
     InputManager* im = InputManager::Get();
     const Vector2f mousePos = im->GetMousePosition();
@@ -154,9 +110,16 @@ void SampleScene::OnUpdate()
 
         float facRes = 1.0f;
 
-        Vector2f vel = (PlayerToMouse * facRes) / dt;
+        Vector2f vel = (PlayerToMouse * facRes) / fixedt;
 
         m_selectedPHEnt->SetVelocity(vel);
+    }
+    if (im->IsKeyDown(SDLK_A))
+    {
+        if (m_selectedPHEnt)
+        {
+            m_selectedPHEnt->SetPosition(mousePos);
+        }
     }
 
     ////spawn boule mass 1

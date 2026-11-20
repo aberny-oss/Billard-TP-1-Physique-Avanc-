@@ -16,3 +16,8 @@ float Scene::GetDeltaTime() const
 {
     return mpGameManager->mDeltaTime;
 }
+
+float Scene::GetFixeDeltaTime() const
+{
+    return mpGameManager->m_fixedDt;
+}

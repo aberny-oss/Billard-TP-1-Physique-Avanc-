@@ -250,6 +250,12 @@ bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
         Vector2f VelocityRelativeBA = p_entA->m_velocity - p_entB->m_velocity;
         float rapprochement = Vector2f::Dot(VelocityRelativeBA, normal);
 
+        //pour éviter de les rapprocher si il s'écarte déja car rapprochement est <= a 0
+        if (rapprochement <= 0.0f)
+        {
+            return true;
+        }
+
         //vector stockant la modification de la velocité de la collision a ajouter a la vélocité de l'objet
         Vector2f CollisionVelA = { 0, 0 };
         Vector2f CollisionVelB = { 0, 0 };

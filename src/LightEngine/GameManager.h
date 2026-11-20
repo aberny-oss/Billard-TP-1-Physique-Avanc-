@@ -32,7 +32,7 @@ class GameManager
 
     float mDeltaTime;
 
-    const float m_fixedDt = 1 / 60.0f;
+    const float m_fixedDt = 1 / 30.0f;
     float m_acc = 0.f;
 
     int mWindowWidth;
@@ -73,6 +73,7 @@ public:
     void LaunchScene(int width = 1280, int height = 720, const char* title = "LightEngine", Color clearColor = Color::Black);
 
     float GetDeltaTime() const { return mDeltaTime; }
+    float GetFixeDeltaTime() const { return m_fixedDt; }
     Scene* GetScene() const { return mpScene; }
 
     void CreateLine(Line& p_line);
