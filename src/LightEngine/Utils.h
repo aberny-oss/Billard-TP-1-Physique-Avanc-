@@ -20,14 +20,10 @@ constexpr float PI = 3.14159265f;
 constexpr float DEG_TO_RAD = PI / 180.f;
 constexpr float RAD_TO_DEG = 180.f / PI;
 
-
-namespace Utils
+struct IntersectInfo
 {
-    Vector2f PointIntersecBySegmentAndCircle(const Segment& p_segment, const Circle& p_circle);
+    bool found;
+    Vector2f point;
+};
 
-
-
-
-
-
-}
+IntersectInfo Intersect(const Circle& c, const Segment& s);

@@ -157,19 +157,23 @@ void SampleScene::OnUpdate()
         Debug::DrawLine(m_viseur.a, m_viseur.b, Color::Red);
     }
 
-    Vector2f lineA = { WindowW * 0.2f, WindowH * 0.1f };
-    Vector2f lineB = { WindowW * 0.8f, WindowH * 0.1f };
-    Debug::DrawLine(lineA, lineB, Color::Green);
 
     if (m_selectedPHEnt)
     {
-        m_segmentCollideTest.a = lineA;
-        m_segmentCollideTest.b = lineB;
+        Segment s;
+        s.a = { 300, 200 };
+        s.b = { 500, 400 };
 
-        m_pointcollideTest.position = m_selectedPHEnt->GetPosition();
+        Debug::DrawLine(s.a, s.b, Color::White);
 
-        Vector2f pointcoll = Utils::PointIntersecBySegmentAndCircle(m_segmentCollideTest, m_pointcollideTest);
-        Debug::DrawCircle(pointcoll, 5, Color::Red, true);
+        Circle c;
+        c.position = m_selectedPHEnt->GetPosition();
+        c.radius = m_selectedPHEnt->GetRadius();
+
+        IntersectInfo info = Intersect(c, s);
+
+        if (info.found)
+            Debug::DrawCircle(info.point, 5.f, Color::Red, true);
     }
     
 

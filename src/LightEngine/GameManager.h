@@ -15,6 +15,8 @@ struct SDL_Renderer;
 struct TTF_TextEngine;
 struct TTF_Font;
 
+#define USE_CCD true
+
 class GameManager
 {
     std::list<Entity*> mEntities;
@@ -32,7 +34,7 @@ class GameManager
 
     float mDeltaTime;
 
-    const float m_fixedDt = 1 / 30.0f;
+    const float m_fixedDt = 1 / 60.0f;
     float m_acc = 0.f;
 
     int mWindowWidth;
@@ -49,6 +51,8 @@ private:
     void Run();
     void Update();
     void UpdatePhysics();
+    void FixedUpdateDCD();
+    void FixedUpdateCCD();
     void Draw();
 
     void SetDeltaTime(uint64 deltaTimeNS) { mDeltaTime = static_cast<float>(deltaTimeNS) / 1000000000.f; }
@@ -59,7 +63,9 @@ private:
     bool ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB);
     void ResolveCollisionARC(Entity* p_entA);
     bool ResolveColisionCBC(Entity* p_entA, Entity* p_entB);
-    bool ResolveCollisonContinueCBC(Entity* p_entA, Entity* p_entB);
+    //bool ResolveCollisonContinueCBC(Entity* p_entA, Entity* p_entB);
+
+    void ResolveCCD(Entity* p_entA, Entity* p_entB, float p_impactDt);
 
 public:
     ~GameManager();

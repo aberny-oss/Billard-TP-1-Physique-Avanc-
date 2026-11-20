@@ -31,6 +31,61 @@ void Entity::FixeUpdate(float dt)
     mCircle.position += m_velocity * dt;
 }
 
+float Entity::WillCollide(const Entity* other, float dt) const
+{
+    Vector2f relativeVelocity = m_velocity - other->m_velocity;
+    Vector2f direction = other->GetPosition() - GetPosition();
+    direction.Normalize();
+
+    float closingSpeed = Vector2f::Dot(relativeVelocity, direction);
+    if (closingSpeed <= 0.f)
+        return -1;
+
+    Vector2f deplacement = relativeVelocity * dt;
+    Segment AE;
+    AE.a = GetPosition();
+    AE.b = AE.a + deplacement;
+
+    Circle B;
+    B.position = other->GetPosition();
+    B.radius = GetRadius() + other->GetRadius();
+
+    IntersectInfo info = Intersect(B, AE);
+    if (info.found == false)
+        return -1;
+
+    float distance = (info.point - AE.a).Magnitude();
+    float ratio = distance / deplacement.Magnitude();
+
+    float impactDT = ratio * dt;
+
+    return impactDT;
+}
+
+void Entity::Bounce(Entity* other)
+{
+    Vector2f normal = (other->GetPosition() - GetPosition()).Normalized();
+    Vector2f relativeVelocity = m_velocity - other->m_velocity;
+    float closingSpeed = Vector2f::Dot(relativeVelocity, normal);
+
+    float totalMass = m_mass + other->m_mass;
+    float ratioA = m_mass / totalMass;
+    float ratioB = 1.f - ratioA;
+
+    Vector2f deltaA = -1 * normal * ratioB * closingSpeed;
+    Vector2f deltaB = normal * ratioA * closingSpeed;
+
+    //Annuler le rapprochement
+    m_velocity += deltaA;
+    other->m_velocity += deltaB;
+
+    float restitution = 0.5f;
+
+    //Créer l'éloignement
+    m_velocity += deltaA * restitution;
+    other->m_velocity += deltaB * restitution;
+}
+
 void Entity::Destroy()
 {
     if (mToDestroy)

@@ -78,6 +78,9 @@ private:
 
     void FixeUpdate(float dt);
 
+    float WillCollide(const Entity* other, float dt) const;
+    void Bounce(Entity* other);
+
     friend class GameManager;
     friend class Scene;
 };
