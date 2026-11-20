@@ -1,25 +1,15 @@
 #pragma once
 
 #include "Scene.h"
-#include <vector>
 
 class DummyEntity;
-class PhysicEntity;
 
 class SampleScene : public Scene
 {
-    Rectangle m_rectangle;
+    DummyEntity* mpEntity1 = nullptr;
+    DummyEntity* mpEntity2 = nullptr;
 
-    Line m_lineUp;
-    Line m_lineDown;
-    Line m_lineLeft;
-    Line m_lineRight;
-
-    std::vector<PhysicEntity*> m_phEnt;
-
-    PhysicEntity* m_selectedPHEnt;
-
-    Entity* m_circleFixed;
+    DummyEntity* mpSelectedEntity = nullptr;
 
 public:
     void OnInitialize() override;

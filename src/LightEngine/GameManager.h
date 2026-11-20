@@ -15,13 +15,15 @@ struct SDL_Renderer;
 struct TTF_TextEngine;
 struct TTF_Font;
 
+#define USE_CCD true
+
 class GameManager
 {
     std::list<Entity*> mEntities;
     std::list<Entity*> mEntitiesToAdd;
 
-    std::list<Line*> m_lines;
-    std::list<Rectangle*> m_rectangles;
+    std::list<Line> mLines;
+    std::list<Rectangle> mRectangles;
 
     SDL_Window* mpWindow;
     SDL_Renderer* mpRenderer;
@@ -31,6 +33,8 @@ class GameManager
     Scene* mpScene;
 
     float mDeltaTime;
+    float mAccFixedDt;
+    float mFixedDeltaTime = 1.f /60.f;
 
     int mWindowWidth;
     int mWindowHeight;
@@ -45,16 +49,13 @@ private:
     bool Initialize(int width, int height, const char* title, Color clearColor);
     void Run();
     void Update();
+    void FixedUpdateDCD(); // DCD
+    void FixedUpdateCCD(); // CCD
     void Draw();
 
     void SetDeltaTime(uint64 deltaTimeNS) { mDeltaTime = static_cast<float>(deltaTimeNS) / 1000000000.f; }
 
     SDL_Window* GetWindow() const { return mpWindow; }
-
-    void ResolveCollisionWithLine(Entity* p_entity);
-    bool ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB);
-    void ResolveCollisionARC(Entity* p_entA);
-    bool ResolveColisionCBC(Entity* p_entA, Entity* p_entB);
 
 public:
     ~GameManager();
@@ -63,15 +64,14 @@ public:
     SDL_Renderer* GetRenderer() const { return mpRenderer; }
     TTF_TextEngine* GetTextEngine() const { return mpTextEngine; }
     TTF_Font* GetFont() const { return mpFont; }
+    void AddLine(Vector2f point, Vector2f normal) { mLines.push_back({ point, normal }); }
 
     template<typename T>
     void LaunchScene(int width = 1280, int height = 720, const char* title = "LightEngine", Color clearColor = Color::Black);
 
     float GetDeltaTime() const { return mDeltaTime; }
+    float GetFixedDeltaTime() const { return mFixedDeltaTime; }
     Scene* GetScene() const { return mpScene; }
-
-    void CreateLine(Line& p_line);
-    void CreateRectangle(Rectangle& p_rectangle);
 
     friend class Scene;
 };

@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <SDL3/SDL_render.h>
+#include <algorithm>
 
 void Entity::Initialize(float radius, const Color& color)
 {
@@ -53,68 +54,15 @@ void Entity::Update()
 {
     float dt = GetDeltaTime();
 
-    mCircle.position += m_velocity * dt;
-
-    //Vector2f bottomRight = GetPosition(1.0f, 1.0f);
-    //Vector2f upLeft = GetPosition(0.0f, 0.0f);
-
-    //Scene* sc = GetScene();
-    //int WWidth = sc->GetWindowWidth();
-    //int WHeight = sc->GetWindowHeight();
-
-    ////Line Up
-    //Line up;
-    //up.normal = { 0, -1 };
-
-    ////Line Down
-    //Line down;
-    //down.normal = { 0, 1 };
-
-    ////Line Left
-    //Line left;
-    //left.normal = { -1, 0 };
-
-    ////Line Right
-    //Line right;
-    //right.normal = { 1, 0 };
-
-    ////Bord Right
-    //float overlapRight = bottomRight.x - WWidth;
-    //if (overlapRight > 0)
-    //{
-    //    mCircle.position.x -= overlapRight;
-    //    m_velocity.x *= -1;
-    //    m_velocity.x *= 0.5f;
-    //}
-
-    ////Bord Down
-    //float overlapDown = bottomRight.y - WHeight;
-    //if (overlapDown > 0)
-    //{
-    //    mCircle.position.y -= overlapDown;
-    //    m_velocity.y *= -1;
-    //    m_velocity.y *= 0.5f;
-    //}
-
-    ////Bord Left
-    //float overlapLeft = upLeft.x;
-    //if (overlapLeft < 0)
-    //{
-    //    mCircle.position.x -= overlapLeft;
-    //    m_velocity.x *= -1;
-    //    m_velocity.x *= 0.5f;
-    //}
-
-    ////Bord Up
-    //float overlapUp = upLeft.y;
-    //if (overlapUp < 0)
-    //{
-    //    mCircle.position.y -= overlapUp;
-    //    m_velocity.y *= -1;
-    //    m_velocity.y *= 0.5f;
-    //}
-
     OnUpdate();
+}
+
+void Entity::FixedUpdate()
+{
+    float fixedDt = GameManager::Get()->GetFixedDeltaTime();
+    //Vector2f gravity = { 0.f, 981.f };
+    //mVelocity += gravity * fixedDt; //#TODO put in gamemanager
+    mCircle.position += mVelocity * fixedDt;
 }
 
 void Entity::Draw(SDL_Renderer* renderer) const
@@ -132,19 +80,197 @@ float Entity::GetDeltaTime() const
     return GameManager::Get()->GetDeltaTime();
 }
 
-void Entity::SetVelocity(Vector2f p_velocity)
+void Entity::TryCollide(Entity* other)
 {
-    m_velocity = p_velocity;
+    Vector2f centerA = GetPosition();
+    Vector2f centerB = other->GetPosition();
+
+    Vector2f AB = centerB - centerA;
+
+    float overlap =  GetRadius() + other->GetRadius() - AB.Magnitude();
+    if (overlap < 0)
+        return;
+
+    Vector2f normal = AB.Normalized();
+    Vector2f translation = normal * overlap * 0.5f; //#TODO
+
+    mCircle.position -= translation;
+    other->mCircle.position += translation;
+
+    Vector2f relativeVelocity = mVelocity - other->mVelocity;
+    float closingSpeed = Vector2f::Dot(relativeVelocity, normal);
+
+    float totalMass = mMass + other->mMass;
+    float ratioA = mMass / totalMass;
+    float ratioB = 1.f - ratioA;
+
+    Vector2f deltaA = -1 * normal * ratioB * closingSpeed;
+    Vector2f deltaB = normal * ratioA * closingSpeed;
+
+    //Annuler le rapprochement
+    mVelocity += deltaA;
+    other->mVelocity += deltaB;
+
+    float restitution = 0.5f;
+
+    //Créer l'éloignement
+    mVelocity += deltaA * restitution;
+    other->mVelocity += deltaB * restitution;
+
+    OnCollision(other);
+    other->OnCollision(this);
 }
 
-bool Entity::IsPointInside(Vector2f p_point)
+void Entity::TryCollide(const Rectangle& rect)
 {
-    Vector2f topLeft = GetPosition(0, 0);
-    Vector2f bottomRight = GetPosition(1, 1);
+    //Detect
+    Vector2f center = GetPosition();
+    float radius = GetRadius();
 
-    if (p_point.x >= topLeft.x && p_point.y >= topLeft.y && p_point.x <= bottomRight.x && p_point.y <= bottomRight.y)
+    Vector2f rectPos = rect.position;
+
+    Vector2f min = rectPos;
+    Vector2f max = min + rect.size;
+    float overlap = 0;
+    Vector2f normal = {};
+    //in rectangle
+    if (center.x >= min.x && center.y >= min.y && center.x <= max.x && center.y <= max.y)
     {
-        return true;
+        float left = center.x - min.x;
+        float right = max.x - center.x;
+        float top = center.y - min.y;
+        float bottom = max.y - center.y;
+
+        float distances[] =
+        {
+            left,
+            right,
+            top,
+            bottom
+        };
+
+        Vector2f normales[] =
+        {
+            {1, 0},
+            {-1, 0},
+            {0, 1},
+            {0, -1},
+        };
+
+        int minIndex = 0;
+        for (int i = 1; i < 4; ++i)
+        {
+            if (distances[i] < distances[minIndex])
+            {
+                minIndex = i;
+            }
+        }
+
+        overlap = distances[minIndex] + GetRadius();
+        normal = normales[minIndex];
     }
-    return false;
+    else
+    {
+        float closestX = std::clamp(center.x, min.x, max.x);
+        float closestY = std::clamp(center.y, min.y, max.y);
+
+        Vector2f closestPoint = { closestX,closestY };
+
+        Vector2f AB = closestPoint - center;
+        float dist = AB.Magnitude();
+        normal = AB.Normalized();
+        overlap = radius - dist;
+
+        if (overlap < 0)
+            return;
+    }
+
+    //Correct
+    Vector2f overlapCorrection = -1 * normal * overlap;
+    mCircle.position += overlapCorrection;
+
+    //Bounce
+    float dot = Vector2f::Dot(mVelocity, normal);
+    Vector2f vn = dot * normal;
+    Vector2f vt = mVelocity - vn;
+
+    mVelocity = -1 * vn + vt;
+}
+
+void Entity::TryCollide(const Line& line)
+{
+    //Detect
+    Vector2f AB = line.point - GetPosition();
+    Vector2f normal = line.normal;
+
+    float distance = Vector2f::Dot(AB, normal);
+    float overlap = GetRadius() - distance;
+    if (overlap < 0)
+        return;
+
+    //Correction
+    Vector2f overlapCorrection = -1 * normal * overlap;
+    mCircle.position += overlapCorrection;
+
+    //Bounce
+    float dot = Vector2f::Dot(mVelocity, normal);
+    Vector2f vn = dot * normal;
+    Vector2f vt = mVelocity - vn;
+
+    mVelocity = -1 * vn + vt;
+}
+
+void Entity::Bounce(Entity* other)
+{
+    Vector2f normal = (other->GetPosition() - GetPosition()).Normalized();
+    Vector2f relativeVelocity = mVelocity - other->mVelocity;
+    float closingSpeed = Vector2f::Dot(relativeVelocity, normal);
+
+    float totalMass = mMass + other->mMass;
+    float ratioA = mMass / totalMass;
+    float ratioB = 1.f - ratioA;
+
+    Vector2f deltaA = -1 * normal * ratioB * closingSpeed;
+    Vector2f deltaB = normal * ratioA * closingSpeed;
+
+    //Annuler le rapprochement
+    mVelocity += deltaA;
+    other->mVelocity += deltaB;
+
+    float restitution = 0.5f;
+
+    //Créer l'éloignement
+    mVelocity += deltaA * restitution;
+    other->mVelocity += deltaB * restitution;
+}
+
+float Entity::WillCollide(const Entity* other, float dt) const
+{
+    Vector2f relativeVelocity = mVelocity - other->mVelocity;
+    Vector2f direction = other->GetPosition() - GetPosition();
+    direction.Normalize();
+   
+    float closingSpeed = Vector2f::Dot(relativeVelocity, direction);
+    if (closingSpeed <= 0.f)
+        return -1;
+
+    Vector2f deplacement = relativeVelocity * dt;
+    Segment AE;
+    AE.a = GetPosition();
+    AE.b = AE.a + deplacement;
+
+    Circle B;
+    B.position = other->GetPosition();
+    B.radius = GetRadius() + other->GetRadius();
+
+    IntersectInfo info = Intersect(B, AE);
+    if (info.found == false)
+        return -1;
+
+    float distance = (info.point - AE.a).Magnitude();
+    float ratio = distance / deplacement.Magnitude();
+
+    float impactDT = ratio * dt;
+
+    return impactDT;
 }

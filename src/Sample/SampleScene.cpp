@@ -3,101 +3,55 @@
 #include "DummyEntity.h"
 #include "InputManager.h"
 #include "Debug.h"
-#include "PhysicEntity.h"
-
 
 void SampleScene::OnInitialize()
 {
-    GameManager* gm = GameManager::Get();
+    mpEntity1 = CreateEntity<DummyEntity>(40.f, Color::Cyan);
+    mpEntity1->SetPosition({ 300.f, 360.f });
+    mpEntity1->SetMass(1);
 
-    int wWidth = GetWindowWidth();
-    int wHeight = GetWindowHeight();
+    mpEntity2 = CreateEntity<DummyEntity>(40.f, Color::Red);
+    mpEntity2->SetPosition({ 600.f, 360.f });
+    mpEntity2->SetMass(1);
 
-    m_lineUp;
-    m_lineUp.normal = { 0, -1 };
-    m_lineUp.point = { 0, 0 };
-    gm->CreateLine(m_lineUp);
+    //mpEntity2 = CreateEntity<DummyEntity>(40.f*2, Color::Cyan);
+    //mpEntity2->SetPosition({ 600.f, 360.f });
+    //mpEntity2->SetMass(10);
 
-    m_lineDown;
-    m_lineDown.normal = { 0, 1 };
-    m_lineDown.point = { wWidth, wHeight };
-    gm->CreateLine(m_lineDown);
-
-    m_lineLeft;
-    m_lineLeft.normal = { -1, 0 };
-    m_lineLeft.point = { 0, 0 };
-    gm->CreateLine(m_lineLeft);
-
-    m_lineRight;
-    m_lineRight.normal = { 1, 0 };
-    m_lineRight.point = { wWidth, wHeight };
-    gm->CreateLine(m_lineRight);
-
-    m_circleFixed = CreateEntity<Entity>(25.0f, Color::Magenta);
-    m_circleFixed->SetPosition({ wWidth * 0.5f, wHeight * 0.5f });
-
-    float radius = 10;
-    for (int i = 0; i < 8; ++i)
-    {
-        PhysicEntity* phent = CreateEntity<PhysicEntity>(radius, Color::Red);
-        phent->SetPosition({ 100 + i * (radius * 3), 50.f });
-        m_phEnt.push_back(phent);
-    }
-
-    m_rectangle.position = { 200, 150 };
-    m_rectangle.size = { 150, 150 };
-    m_rectangle.color = Color::Green;
-    m_rectangle.filled = false;
-    gm->CreateRectangle(m_rectangle);
-
-
+    //GameManager::Get()->AddLine({ 0, 0 }, { 0, -1 }); //TOP
+    //GameManager::Get()->AddLine({ 0, 0 }, { -1, 0 }); //LEFT
+    //GameManager::Get()->AddLine({ 0, GetWindowHeight()}, {0, 1}); //BOTTOM
+    //GameManager::Get()->AddLine({ GetWindowWidth(), 0}, {1, 0}); //RIGHT
 
 }
 
 void SampleScene::OnUpdate()
 {
-    InputManager* im = InputManager::Get();
+    //if (InputManager::Get()->IsMouseDown(SDL_BUTTON_LEFT))
+    //{
+    //    Vector2f mousePos = InputManager::Get()->GetMousePosition();
+    //    Vector2f pos = mpEntity1->GetPosition();
 
-    if (im->IsMouseDown(SDL_BUTTON_LEFT))
-    {
-        bool selectedent = false;
-        Vector2f mousePos = im->GetMousePosition();
-        for (PhysicEntity* phent : m_phEnt)
-        {
-            if (phent->IsPointInside(mousePos))
-            {
-                if (m_selectedPHEnt)
-                {
-                    m_selectedPHEnt->SetColor(Color::Red);
-                }
-                m_selectedPHEnt = phent;
-                m_selectedPHEnt->SetColor(Color::Cyan);
-                selectedent = true;
-                break;
-            }
-        }
-        if (selectedent)
-        {
-            return;
-        }
+    //    mpEntity1->SetVelocity(mousePos - pos);
 
-        if (m_selectedPHEnt)
-        {
-            Vector2f center = m_selectedPHEnt->GetPosition();
+    //    //Do something
+    //}
 
-            m_selectedPHEnt->SetVelocity(m_selectedPHEnt->GetVelocity() + (mousePos - center) * 0.69f);
-        }
-    }
-    if (im->IsMouseDown(SDL_BUTTON_RIGHT))
-    {
-        if (m_selectedPHEnt)
-        {
-            m_selectedPHEnt->SetColor(Color::Red);
-            m_selectedPHEnt = nullptr;
-        }
-    }
+    Vector2f mousePos = InputManager::Get()->GetMousePosition();
+    mpEntity1->SetVelocity(10*(mousePos - mpEntity1->GetPosition()));
 
-    Debug::DrawRectangle(m_rectangle.position, m_rectangle.size, m_rectangle.color, m_rectangle.filled);
+    Segment s;
+    s.a = { 300, 200 };
+    s.b = { 500, 400 };
 
-    
+    Debug::DrawLine(s.a, s.b, Color::White);
+
+    Circle c;
+    c.position = mpEntity1->GetPosition();
+    c.radius = mpEntity1->GetRadius();
+
+    IntersectInfo info = Intersect(c, s);
+
+    if (info.found)
+        Debug::DrawCircle(info.point, 10.f, Color::Red, true);
 }

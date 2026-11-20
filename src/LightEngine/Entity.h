@@ -14,11 +14,16 @@ protected:
     Circle mCircle;
     int mTag = -1;
     bool mToDestroy = false;
-    Vector2f m_velocity;
+    Vector2f mVelocity;
+
+    float mMass = 1.0f;
 
 public:
     void SetPosition(Vector2f position, float ratioX = 0.5f, float ratioY = 0.5f);
     void SetTag(int tag) { mTag = tag; }
+    void SetVelocity(Vector2f velocity ) { mVelocity = velocity; }
+    void SetMass(float mass) { mMass = mass; }
+
     float GetRadius() const { return mCircle.radius; }
 
     Vector2f GetPosition(float ratioX = 0.5f, float ratioY = 0.5f) const;
@@ -37,13 +42,6 @@ public:
     template<typename T>
     T* CreateEntity(float radius, const Color& color);
 
-    void SetVelocity(Vector2f p_velocity);
-    Vector2f GetVelocity() { return m_velocity; }
-
-    bool IsPointInside(Vector2f p_point);
-
-    void SetColor(Color p_color) { mCircle.color = p_color; }
-
 protected:
     Entity() = default;
     virtual ~Entity() = default;
@@ -55,8 +53,16 @@ protected:
 
 private:
     void Update();
+    void FixedUpdate();
     void Draw(SDL_Renderer* renderer) const;
     void Initialize(float radius, const Color& color);
+
+    void TryCollide(Entity* entity);
+    void TryCollide(const Rectangle& rect);
+    void TryCollide(const Line& rect);
+
+    float WillCollide(const Entity* other, float dt) const;
+    void Bounce(Entity* other);
 
     friend class GameManager;
     friend class Scene;

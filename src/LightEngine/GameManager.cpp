@@ -10,9 +10,6 @@
 #include "SDL3/SDL.h"
 #include <SDL_ttf.h>
 
-#include <algorithm>
-
-
 GameManager::GameManager()
 {
     mpWindow = nullptr;
@@ -31,176 +28,6 @@ GameManager* GameManager::Get()
     static GameManager mInstance;
 
     return &mInstance;
-}
-
-void GameManager::CreateLine(Line& p_line)
-{
-    m_lines.push_back(&p_line);
-}
-
-void GameManager::CreateRectangle(Rectangle& p_rectangle)
-{
-    m_rectangles.push_back(&p_rectangle);
-}
-
-void GameManager::ResolveCollisionWithLine(Entity* p_entity)
-{
-    for (Line* line : m_lines)
-    {
-        Vector2f toLine = line->point - p_entity->GetPosition();
-        float distance = Vector2f::Dot(toLine, line->normal);
-        float overlap = p_entity->GetRadius() - distance;
-        if (overlap > 0.0f)
-        {
-            p_entity->SetPosition(p_entity->GetPosition() - line->normal * overlap);
-
-            float dotVel = Vector2f::Dot(p_entity->m_velocity, line->normal);
-            Vector2f vn = line->normal * dotVel;
-            Vector2f vt = p_entity->m_velocity - vn;
-            p_entity->m_velocity = -1 * vn + vt;
-        }
-    }
-}
-
-bool GameManager::ResolveColisionCBCWithFixed(Entity* p_entA, Entity* p_entB)
-{
-    Entity* mouvEnt = nullptr;
-    Entity* fixedEnt = nullptr;
-    if (p_entB->m_velocity != Vector2f{ 0, 0 })
-    {
-        mouvEnt = p_entB;
-        fixedEnt = p_entA;
-    }
-    else if (p_entA->m_velocity != Vector2f{ 0, 0 })
-    {
-        mouvEnt = p_entA;
-        fixedEnt = p_entB;
-    }
-
-    if (mouvEnt == nullptr || fixedEnt == nullptr)
-    {
-        return false;
-    }
-    
-    //Correction Position de A en mouvement et B fixe
-    Vector2f AB = fixedEnt->GetPosition() - mouvEnt->GetPosition();
-    float distance = AB.Magnitude();
-    AB.Normalize();
-    Vector2f normal = AB;
-    float overlap = mouvEnt->GetRadius() + fixedEnt->GetRadius() - distance;
-    if (overlap > 0.0f) // collision
-    {
-        Vector2f newPos = { mouvEnt->GetPosition().x - normal.x * overlap, mouvEnt->GetPosition().y - normal.y * overlap };
-        mouvEnt->SetPosition(newPos);
-
-        //Correction Velocité de A en mouvement et B fixe
-        Vector2f vn = normal * Vector2f::Dot(mouvEnt->m_velocity, normal);
-        Vector2f vt = mouvEnt->m_velocity - vn;
-        mouvEnt->m_velocity = -1 * vn + vt;
-        return true;
-    }
-    return false;
-}
-
-void GameManager::ResolveCollisionARC(Entity* p_entA)
-{
-    Vector2f centerA = p_entA->GetPosition();
-    float radiusA = p_entA->GetRadius();
-
-    Vector2f topLeft = p_entA->GetPosition(0, 0);
-    Vector2f bottomRight = p_entA->GetPosition(1, 1);
-
-    for (Rectangle* rect : m_rectangles)
-    {
-        Vector2f bottomRightRect = rect->position + rect->size;
-        // si rentre dans le if alors il est a l'interieur du rect
-        if (topLeft.x >= rect->position.x && topLeft.y >= rect->position.y && bottomRight.x <= bottomRightRect.x && bottomRight.y <= bottomRightRect.y)
-        {
-            float leftSide = centerA.x - rect->position.x;
-            float rightSide = bottomRightRect.x - centerA.x;
-            float topSide = centerA.y - rect->position.y;
-            float bottomSide = bottomRightRect.y - centerA.y;
-
-            float SideSelected = std::min({ leftSide, rightSide, topSide, bottomSide });
-
-            Vector2f normal = { 0, 0 };
-            if (SideSelected == leftSide)
-            {
-                normal = { 1, 0 };
-            }
-            else if (SideSelected == rightSide)
-            {
-                normal = { -1, 0 };
-            }
-            else if (SideSelected == topSide)
-            {
-                normal = { 0, 1 };
-            }
-            else if (SideSelected == bottomSide)
-            {
-                normal = { 0, -1 };
-            }
-
-            float overlap = radiusA + SideSelected;
-            p_entA->SetPosition(p_entA->GetPosition() - normal * overlap);
-
-            float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
-            Vector2f vn = normal * dotVel;
-            Vector2f vt = p_entA->m_velocity - vn;
-            p_entA->m_velocity = -1 * vn + vt;
-        }
-        else
-        {
-            float closestX = std::clamp(centerA.x, rect->position.x, bottomRightRect.x);
-            float closestY = std::clamp(centerA.y, rect->position.y, bottomRightRect.y);
-            Vector2f closestPoint = { closestX, closestY };
-
-            Vector2f direction = closestPoint - centerA;
-            float distance = direction.Magnitude();
-
-            if (distance < radiusA) // collision
-            {
-                Vector2f normal = direction.Normalized();
-                float overlap = radiusA - distance;
-                p_entA->SetPosition(p_entA->GetPosition() - normal * overlap);
-
-                float dotVel = Vector2f::Dot(p_entA->m_velocity, normal);
-                Vector2f vn = normal * dotVel;
-                Vector2f vt = p_entA->m_velocity - vn;
-                p_entA->m_velocity = -1 * vn + vt;
-            }
-        }
-    }
-}
-
-bool GameManager::ResolveColisionCBC(Entity* p_entA, Entity* p_entB)
-{
-    //Correction Position de A en mouvement et B fixe
-    Vector2f AB = p_entB->GetPosition() - p_entA->GetPosition();
-    float distance = AB.Magnitude();
-    AB.Normalize();
-    Vector2f normal = AB;
-    float overlap = p_entA->GetRadius() + p_entB->GetRadius() - distance;
-    if (overlap > 0.0f) // collision
-    {
-        float demiOverlap = overlap * 0.5f;
-        Vector2f newPosA = { p_entA->GetPosition().x - normal.x * demiOverlap, p_entA->GetPosition().y - normal.y * demiOverlap };
-        p_entA->SetPosition(newPosA);
-
-        Vector2f newPosB = { p_entB->GetPosition().x + normal.x * demiOverlap, p_entB->GetPosition().y + normal.y * demiOverlap };
-        p_entB->SetPosition(newPosB);
-
-        Vector2f vnA = normal * Vector2f::Dot(p_entA->m_velocity, normal);
-        Vector2f vtA = p_entA->m_velocity - vnA;
-        Vector2f vnB = normal * Vector2f::Dot(p_entB->m_velocity, normal);
-        Vector2f vtB = p_entB->m_velocity - vnB;
-
-        p_entA->m_velocity = vnB + vtA;
-        p_entB->m_velocity = vnA + vtB;
-
-        return true;
-    }
-    return false;
 }
 
 GameManager::~GameManager()
@@ -312,6 +139,13 @@ void GameManager::Run()
 
         Update();
 
+        mAccFixedDt += mDeltaTime;
+        while (mAccFixedDt >= mFixedDeltaTime)
+        {
+            USE_CCD ? FixedUpdateCCD() : FixedUpdateDCD();
+            mAccFixedDt -= mFixedDeltaTime;
+        }
+
         Draw();
     }
 }
@@ -329,41 +163,6 @@ void GameManager::Update()
             entity->Update();
     }
 
-    //Collision
-    for (auto it1 = mEntities.begin(); it1 != mEntities.end(); ++it1)
-    {
-        Entity* entity = *it1;
-
-        ResolveCollisionWithLine(entity);
-        ResolveCollisionARC(entity);
-
-        auto it2 = it1;
-        ++it2;
-        for (; it2 != mEntities.end(); ++it2)
-        {
-            Entity* otherEntity = *it2;
-
-            if (entity->m_velocity != Vector2f{ 0, 0 } && otherEntity->m_velocity != Vector2f{ 0, 0 })
-            {
-                if (ResolveColisionCBC(entity, otherEntity) == false)
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                if (ResolveColisionCBCWithFixed(entity, otherEntity) == false)
-                {
-                    continue;
-                }
-            }
-            //#TODO
-
-            entity->OnCollision(otherEntity);
-            otherEntity->OnCollision(entity);
-        }
-    }
-
     for (auto it = mEntities.begin(); it != mEntities.end(); )
     {
         Entity* entity = *it;
@@ -377,6 +176,91 @@ void GameManager::Update()
         delete entity;
         it = mEntities.erase(it);
     }
+}
+
+void GameManager::FixedUpdateDCD()
+{
+    //Update
+    for (Entity* entity : mEntities)
+    {
+        if (entity->ToDestroy() == false)
+            entity->FixedUpdate();
+    }
+
+    //Collision
+    for (auto it1 = mEntities.begin(); it1 != mEntities.end(); ++it1)
+    {
+        Entity* entity = *it1;
+
+        auto it2 = it1;
+        ++it2;
+        for (; it2 != mEntities.end(); ++it2)
+        {
+            Entity* otherEntity = *it2;
+            entity->TryCollide(otherEntity);
+        }
+
+        for (const Rectangle& rectangle : mRectangles)
+        {
+            entity->TryCollide(rectangle);
+        }
+
+        for (const Line& line : mLines)
+        {
+            entity->TryCollide(line);
+        }
+    }
+}
+
+void GameManager::FixedUpdateCCD()
+{
+    float remainingDt = mFixedDeltaTime;
+
+    while( remainingDt > 0)
+    {
+        bool found = false;
+
+        //Collision
+        for (auto it1 = mEntities.begin(); it1 != mEntities.end(); ++it1)
+        {
+            Entity* entity = *it1;
+
+            auto it2 = it1;
+            ++it2;
+            for (; it2 != mEntities.end(); ++it2)
+            {
+                Entity* otherEntity = *it2;
+
+                float impactDT = entity->WillCollide(otherEntity, remainingDt);
+
+                if (impactDT < 0.f)
+                    continue;
+
+                found = true;
+
+                entity->mCircle.position += impactDT * entity->mVelocity;
+                otherEntity->mCircle.position += impactDT * otherEntity->mVelocity;
+
+                entity->Bounce(otherEntity);
+
+
+                remainingDt -= impactDT;
+            }
+        }
+
+        if (found == false)
+        {
+            for (Entity* entity : mEntities)
+            {
+                entity->mCircle.position += remainingDt * entity->mVelocity;
+            }
+
+            break;
+        }
+    }
+
+
+    
 }
 
 void GameManager::Draw()
